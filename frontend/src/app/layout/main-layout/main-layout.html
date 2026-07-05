@@ -1,13 +1,28 @@
 <div class="layout">
 
   <aside class="sidebar">
-    <h2>School MS</h2>
+    <h2 class="logo">School MS</h2>
+
+    <nav class="menu">
+      <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
+      <a routerLink="/students" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Students</a>
+      <a routerLink="/teachers" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Teachers</a>
+      <a routerLink="/classes" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Classes</a>
+      <a routerLink="/subjects" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Subjects</a>
+    </nav>
+
+    <button class="logout-btn" (click)="logout()">
+      Logout
+    </button>
   </aside>
 
   <div class="main">
 
     <header class="topbar">
-      <h3>Top Bar</h3>
+      <div class="user-info">
+        Logged in as:
+        <b>{{ user?.fullName }}</b>
+      </div>
     </header>
 
     <section class="content">

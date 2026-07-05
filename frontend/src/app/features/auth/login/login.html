@@ -2,16 +2,30 @@
 
   <h2>School Management System</h2>
 
-  <form>
+  <form (ngSubmit)="onLogin()">
 
     <label>Username</label>
-    <input type="text" placeholder="Enter username" />
+    <input
+      type="text"
+      placeholder="Enter username"
+      [(ngModel)]="username"
+      name="username"
+    />
 
     <label>Password</label>
-    <input type="password" placeholder="Enter password" />
+    <input
+      type="password"
+      placeholder="Enter password"
+      [(ngModel)]="password"
+      name="password"
+    />
 
     <button type="submit">Login</button>
 
   </form>
+
+  <p *ngIf="errorMessage" style="color:red;">
+    {{ errorMessage }}
+  </p>
 
 </div>
