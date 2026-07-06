@@ -13,21 +13,27 @@ export class AuthService {
       id: 1,
       username: 'admin',
       password: 'admin123',
-      fullName: 'System Admin',
+      firstName: 'System',
+      lastName: 'Admin',
+      email: 'system@admin.com',
       role: UserRole.Director
     },
     {
       id: 2,
       username: 'teacher',
       password: 'teacher123',
-      fullName: 'John Teacher',
+      firstName: 'John',
+      lastName: 'Teacher',
+      email: 'john@teacher.com',
       role: UserRole.Teacher
     },
     {
       id: 3,
       username: 'student',
       password: 'student123',
-      fullName: 'Jane Student',
+      firstName: 'Jane',
+      lastName: 'Student',
+      email: 'jane@student.com',
       role: UserRole.Student
     }
   ];

@@ -1,0 +1,37 @@
+<div class="page-header">
+  <h1>Teachers</h1>
+
+  <button class="add-btn" routerLink="/teachers/new">
+    + Add New
+  </button>
+</div>
+
+<table class="table">
+
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Full Name</th>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let teacher of teachers">
+
+      <td>{{ teacher.id }}</td>
+      <td>{{ teacher.firstName }} {{ teacher.lastName }}</td>
+      <td>{{ teacher.username }}</td>
+      <td>{{ teacher.email }}</td>
+
+      <td class="actions">
+        <button class="edit-btn" [routerLink]="['/teachers/edit', teacher.id]">Edit</button>
+        <button class="delete-btn" (click)="delete(teacher.id)">Delete</button>
+      </td>
+
+    </tr>
+  </tbody>
+
+</table>

@@ -8,7 +8,14 @@ export enum UserRole {
 export interface User {
   id: number;
   username: string;
+
+  // NOTE: used only for login mock now
+  // later backend will NEVER return password
   password: string;
-  fullName: string;
+
+  firstName: string;
+  lastName: string;
+
+  email: string;
   role: UserRole;
 }
