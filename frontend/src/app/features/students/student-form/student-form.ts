@@ -3,9 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { StudentService } from '../../../core/services/student.service';
-import { User } from '../../../core/models/user.model';
+import { UserService } from '../../../core/services/user.service';
+import { User, UserRole } from '../../../core/models/user.model';
 import { SchoolClass } from '../../../core/models/school-class.model';
+import { SchoolClassService } from '../../../core/services/schoolClass.service';
+import { AssignmentService } from '../../../core/services/assignment.service';
 
 @Component({
   selector: 'app-student-form',
@@ -25,7 +27,9 @@ export class StudentForm implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private studentService: StudentService
+    private userService: UserService,
+    private schoolClassService: SchoolClassService,
+    private assignmentService: AssignmentService
   ) {}
 
   ngOnInit(): void {
@@ -39,17 +43,17 @@ export class StudentForm implements OnInit {
       classId: [null]
     });
 
-    this.classes = this.studentService.getClasses();
+    this.classes = this.schoolClassService.getClasses();
 
     this.studentId = Number(this.route.snapshot.paramMap.get('id'));
 
     if (this.studentId) {
       this.isEditMode = true;
-      const student = this.studentService.getStudentById(this.studentId);
+      const student = this.userService.getUserById(this.studentId);
 
       if (student) {
 
-        const studentClass = this.studentService.getStudentClass(student.id);
+        const studentClass = this.assignmentService.getStudentClass(student.id);
 
         this.form.patchValue({
           ...student,
@@ -65,19 +69,18 @@ export class StudentForm implements OnInit {
 
     if (this.isEditMode) {
 
-      this.studentService.updateStudent(this.studentId!, studentData);
+      this.userService.updateUser(this.studentId!, studentData);
 
-      this.studentService.assignStudentToClass(this.studentId!, classId);
+      this.assignmentService.assignStudentToClass(this.studentId!, classId);
 
     } else {
 
-      const newStudent = this.studentService.addStudent({
-        id: 0,
-        role: 'Student',
+      const newStudent = this.userService.addUser({
+        role: UserRole.Student,
         ...studentData
       });
 
-      this.studentService.assignStudentToClass(newStudent.id, classId);
+      this.assignmentService.assignStudentToClass(newStudent.id, classId);
     }
 
     this.router.navigate(['/students']);

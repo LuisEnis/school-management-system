@@ -1,7 +1,7 @@
 export interface TeachingAssignment {
   id: number;
 
-  classId: number;
+  schoolClassId: number;
   subjectId: number;
   teacherId: number; // User.id (role = Teacher)
 }

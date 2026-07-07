@@ -7,6 +7,11 @@ import { StudentList } from './features/students/student-list/student-list';
 import { StudentForm } from './features/students/student-form/student-form';
 import { TeacherList } from './features/teachers/teacher-list/teacher-list';
 import { TeacherForm } from './features/teachers/teacher-form/teacher-form';
+import { SubjectList } from './features/subjects/subject-list/subject-list';
+import { SubjectForm } from './features/subjects/subject-form/subject-form';
+import { SchoolClassList } from './features/schoolClasses/school-class-list/school-class-list';
+import { SchoolClassForm } from './features/schoolClasses/school-class-form/school-class-form';
+import { TeacherSubjectAssignment } from './features/assignments/teacher-subject-assignment/teacher-subject-assignment';
 
 export const routes: Routes = [
   {
@@ -50,6 +55,34 @@ export const routes: Routes = [
       {
         path: 'teachers/edit/:id',
         component: TeacherForm
+      },
+      {
+        path: 'subjects',
+        component: SubjectList
+      },
+      {
+        path: 'subjects/new',
+        component: SubjectForm
+      },
+      {
+        path: 'subjects/edit/:id',
+        component: SubjectForm
+      },
+      {
+        path: 'schoolClasses',
+        component: SchoolClassList
+      },
+      {
+        path: 'schoolClasses/new',
+        component: SchoolClassForm
+      },
+      {
+        path: 'schoolClasses/edit/:id',
+        component: SchoolClassForm
+      },
+      {
+        path: 'assignments',
+        component: TeacherSubjectAssignment
       }
     ]
   }

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { StudentService } from '../../../core/services/student.service';
+import { UserService } from '../../../core/services/user.service';
 import { User, UserRole } from '../../../core/models/user.model';
 
 @Component({
@@ -23,7 +23,7 @@ export class TeacherForm implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private studentService: StudentService
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -41,8 +41,7 @@ export class TeacherForm implements OnInit {
     if (this.teacherId) {
       this.isEditMode = true;
 
-      const teacher = this.studentService.getStudents()
-        .find(u => u.id === this.teacherId && u.role === UserRole.Teacher);
+      const teacher = this.userService.getUserById(this.teacherId);
 
       if (teacher) {
         this.form.patchValue(teacher);
@@ -54,12 +53,11 @@ export class TeacherForm implements OnInit {
 
     if (this.isEditMode) {
 
-      this.studentService.updateStudent(this.teacherId!, this.form.value);
+      this.userService.updateUser(this.teacherId!, this.form.value);
 
     } else {
 
-      this.studentService.addStudent({
-        id: 0,
+      this.userService.addUser({
         role: UserRole.Teacher,
         ...this.form.value
       });

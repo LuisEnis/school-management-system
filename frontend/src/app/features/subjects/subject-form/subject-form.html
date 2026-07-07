@@ -1,0 +1,18 @@
+<div class="form-container">
+
+  <h2>{{ isEditMode ? 'Edit Subject' : 'Add Subject' }}</h2>
+
+  <form [formGroup]="form" (ngSubmit)="save()" class="form">
+
+    <div class="form-group">
+      <label>Name</label>
+      <input formControlName="name" />
+    </div>
+
+    <button type="submit" class="submit-btn">
+      {{ isEditMode ? 'Update' : 'Create' }}
+    </button>
+
+  </form>
+
+</div>

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { StudentService } from '../../../core/services/student.service';
+import { UserService } from '../../../core/services/user.service';
 import { User, UserRole } from '../../../core/models/user.model';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -17,18 +17,16 @@ export class TeacherList implements OnInit {
 
   teachers: User[] = [];
 
-  constructor(private studentService: StudentService) {}
+  constructor(private userService: UserService) {}
 
   ngOnInit(): void {
-    this.teachers = this.studentService
-      .getStudents()
-      .filter(u => u.role === UserRole.Teacher);
+    this.teachers = this.userService
+      .getUsersByRole(UserRole.Teacher);
   }
 
   delete(id: number) {
-    this.studentService.deleteStudent(id);
-    this.teachers = this.studentService
-      .getStudents()
-      .filter(u => u.role === UserRole.Teacher);
+    this.userService.deleteUser(id);
+    this.teachers = this.userService
+      .getUsersByRole(UserRole.Teacher);
   }
 }

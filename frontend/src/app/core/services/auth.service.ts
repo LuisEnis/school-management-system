@@ -1,75 +1,99 @@
 import { Injectable } from '@angular/core';
 import { User, UserRole } from '../models/user.model';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
+
   private currentUser: User | null = null;
 
-  private users: User[] = [
-    {
-      id: 1,
-      username: 'admin',
-      password: 'admin123',
-      firstName: 'System',
-      lastName: 'Admin',
-      email: 'system@admin.com',
-      role: UserRole.Director
-    },
-    {
-      id: 2,
-      username: 'teacher',
-      password: 'teacher123',
-      firstName: 'John',
-      lastName: 'Teacher',
-      email: 'john@teacher.com',
-      role: UserRole.Teacher
-    },
-    {
-      id: 3,
-      username: 'student',
-      password: 'student123',
-      firstName: 'Jane',
-      lastName: 'Student',
-      email: 'jane@student.com',
-      role: UserRole.Student
-    }
-  ];
 
-  login(username: string, password: string): User | null {
-    const user = this.users.find(
-      u => u.username === username && u.password === password
-    );
+  constructor(
+    private userService: UserService
+  ){}
 
-    if (user) {
+
+
+  login(
+    username:string,
+    password:string
+  ): User | null {
+
+
+    const user =
+      this.userService
+        .getUsers()
+        .find(
+          u =>
+          u.username === username &&
+          u.password === password
+        );
+
+
+    if(user){
+
       this.currentUser = user;
-      localStorage.setItem('user', JSON.stringify(user));
+
+      localStorage.setItem(
+        'user',
+        JSON.stringify(user)
+      );
+
       return user;
+
     }
+
 
     return null;
   }
 
-  logout(): void {
+
+
+  logout():void {
+
     this.currentUser = null;
+
     localStorage.removeItem('user');
+
   }
 
-  getCurrentUser(): User | null {
-    if (this.currentUser) return this.currentUser;
 
-    const stored = localStorage.getItem('user');
-    if (stored) {
-      this.currentUser = JSON.parse(stored);
+
+  getCurrentUser():User|null {
+
+
+    if(this.currentUser)
       return this.currentUser;
+
+
+
+    const stored =
+      localStorage.getItem('user');
+
+
+    if(stored){
+
+      this.currentUser =
+        JSON.parse(stored);
+
+      return this.currentUser;
+
     }
 
+
     return null;
+
   }
 
-  isLoggedIn(): boolean {
+
+
+  isLoggedIn():boolean {
+
     return this.getCurrentUser() !== null;
+
   }
+
 }

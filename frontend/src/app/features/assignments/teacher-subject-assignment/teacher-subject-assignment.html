@@ -1,0 +1,204 @@
+<div class="form-container">
+
+    <h2>Assign Subject to Teacher</h2>
+
+    <form
+        [formGroup]="form"
+        (ngSubmit)="save()"
+        class="form">
+
+        <div class="form-group">
+
+            <label>Teacher</label>
+
+            <select formControlName="teacherId">
+
+                <option [ngValue]="null">
+                    Select Teacher
+                </option>
+
+                <option
+                    *ngFor="let teacher of teachers"
+                    [ngValue]="teacher.id">
+
+                    {{ teacher.firstName }} {{ teacher.lastName }}
+
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Subject</label>
+
+            <select formControlName="subjectId">
+
+                <option [ngValue]="null">
+                    Select Subject
+                </option>
+
+                <option
+                    *ngFor="let subject of subjects"
+                    [ngValue]="subject.id">
+
+                    {{ subject.name }}
+
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="submit-btn"
+            [disabled]="form.invalid">
+
+            Save Assignment
+
+        </button>
+
+
+    </form>
+
+</div>
+
+
+<div class="table-container">
+
+    <h2>Assignments</h2>
+
+
+    <!-- Filters -->
+    <div class="filters"
+         [formGroup]="filterForm">
+
+
+        <div class="form-group">
+
+            <label>Filter by Teacher</label>
+
+            <select formControlName="teacherId">
+
+                <option [ngValue]="null">
+                    All Teachers
+                </option>
+
+                <option
+                    *ngFor="let teacher of teachers"
+                    [ngValue]="teacher.id">
+
+                    {{ teacher.firstName }} {{ teacher.lastName }}
+
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Filter by Subject</label>
+
+            <select formControlName="subjectId">
+
+                <option [ngValue]="null">
+                    All Subjects
+                </option>
+
+                <option
+                    *ngFor="let subject of subjects"
+                    [ngValue]="subject.id">
+
+                    {{ subject.name }}
+
+                </option>
+
+            </select>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- Assignment table -->
+
+    <table class="table">
+
+        <thead>
+
+            <tr>
+
+                <th>Teacher</th>
+                <th>Subject</th>
+                <th>Actions</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+
+            <tr
+                *ngFor="let assignment of filteredAssignments">
+
+
+                <td>
+                    {{ getTeacherName(assignment.teacherId) }}
+                </td>
+
+
+                <td>
+                    {{ getSubjectName(assignment.subjectId) }}
+                </td>
+
+
+                <td class="actions">
+
+
+                    <button
+                        class="delete-btn"
+                        (click)="deleteAssignment(
+                            assignment.teacherId,
+                            assignment.subjectId
+                        )">
+
+                        Delete
+
+                    </button>
+
+
+                </td>
+
+
+            </tr>
+
+
+
+            <tr *ngIf="filteredAssignments.length === 0">
+
+                <td colspan="3" class="empty">
+
+                    No assignments found.
+
+                </td>
+
+            </tr>
+
+
+        </tbody>
+
+
+    </table>
+
+
+</div>
