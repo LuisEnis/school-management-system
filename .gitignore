@@ -1,0 +1,25 @@
+# Visual Studio
+.vs/
+
+# Build output
+**/bin/
+**/obj/
+
+# Visual Studio user files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# Logs
+*.log
+
+# Angular / Node
+node_modules/
+dist/
+
+# Environment files
+.env
