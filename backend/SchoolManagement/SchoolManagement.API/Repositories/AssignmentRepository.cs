@@ -85,6 +85,28 @@ namespace SchoolManagement.API.Repositories
                     x.TeacherId == teacherId);
         }
 
+        public async Task<bool> TeacherCanTeachSubjectAsync(int teacherId, int subjectId)
+        {
+            return await _context.TeacherSubjects
+                .AnyAsync(x =>
+                    x.TeacherId == teacherId &&
+                    x.SubjectId == subjectId);
+        }
+
+        public async Task<bool> TeachingAssignmentExistsForClassAsync(int classId, int subjectId)
+        {
+            return await _context.TeachingAssignments
+                .AnyAsync(x =>
+                    x.SchoolClassId == classId &&
+                    x.SubjectId == subjectId);
+        }
+
+        public async Task<bool> StudentAlreadyAssignedToClassAsync(int studentId)
+        {
+            return await _context.StudentClasses
+                .AnyAsync(x =>
+                    x.StudentId == studentId);
+        }
 
         public async Task SaveChangesAsync()
         {

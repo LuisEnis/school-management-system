@@ -4,28 +4,16 @@ namespace SchoolManagement.API.Interfaces.Services
 {
     public interface IAssignmentService
     {
-        public interface IAssignmentService
-        {
-            Task AssignStudentToClassAsync(StudentClassAssignmentDto dto);
+        Task<StudentClassAssignmentDto> AssignStudentToClassAsync(CreateStudentClassAssignmentDto dto);
 
-            Task AssignTeacherToSubjectAsync(TeacherSubjectAssignmentDto dto);
+        Task<TeacherSubjectAssignmentDto> AssignTeacherToSubjectAsync(CreateTeacherSubjectAssignmentDto dto);
 
-            Task AssignTeacherToClassSubjectAsync(
-                TeachingAssignmentDto dto);
+        Task<TeachingAssignmentDto> AssignTeacherToClassSubjectAsync(CreateTeachingAssignmentDto dto);
 
+        Task<bool> RemoveStudentFromClassAsync(int studentId, int classId);
 
-            Task<bool> RemoveStudentFromClassAsync(
-                int studentId,
-                int classId);
+        Task<bool> RemoveTeacherFromSubjectAsync(int teacherId, int subjectId);
 
-            Task<bool> RemoveTeacherFromSubjectAsync(
-                int teacherId,
-                int subjectId);
-
-            Task<bool> RemoveTeachingAssignmentAsync(
-                int classId,
-                int subjectId,
-                int teacherId);
-        }
+        Task<bool> RemoveTeachingAssignmentAsync(int classId, int subjectId, int teacherId);
     }
 }

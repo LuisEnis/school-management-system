@@ -8,11 +8,17 @@ namespace SchoolManagement.API.Mappings
     {
         public AssignmentProfile()
         {
-            CreateMap<StudentClassAssignmentDto, StudentClass>();
+            CreateMap<CreateStudentClassAssignmentDto, StudentClass>();
 
-            CreateMap<TeacherSubjectAssignmentDto, TeacherSubject>();
+            CreateMap<CreateTeacherSubjectAssignmentDto, TeacherSubject>();
 
-            CreateMap<TeachingAssignmentDto, TeachingAssignment>();
+            CreateMap<CreateTeachingAssignmentDto, TeachingAssignment>();
+
+            CreateMap<StudentClass, StudentClassAssignmentDto>();
+
+            CreateMap<TeacherSubject, TeacherSubjectAssignmentDto>();
+
+            CreateMap<TeachingAssignment, TeachingAssignmentDto>();
         }
     }
 }

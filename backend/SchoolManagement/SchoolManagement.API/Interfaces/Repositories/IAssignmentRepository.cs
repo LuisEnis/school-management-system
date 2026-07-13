@@ -22,12 +22,13 @@ namespace SchoolManagement.API.Interfaces.Repositories
 
         Task<TeacherSubject?> GetTeacherSubjectAsync(int teacherId, int subjectId);
 
-        Task<TeachingAssignment?> GetTeachingAssignmentAsync(
-            int classId,
-            int subjectId,
-            int teacherId);
+        Task<TeachingAssignment?> GetTeachingAssignmentAsync(int classId, int subjectId, int teacherId);
 
+        Task<bool> TeacherCanTeachSubjectAsync(int teacherId, int subjectId);
 
+        Task<bool> TeachingAssignmentExistsForClassAsync(int classId, int subjectId);
+
+        Task<bool> StudentAlreadyAssignedToClassAsync(int studentId);
         Task SaveChangesAsync();
     }
 }
