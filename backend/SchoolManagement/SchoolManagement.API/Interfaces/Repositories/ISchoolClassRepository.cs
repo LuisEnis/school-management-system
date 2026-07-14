@@ -14,6 +14,12 @@ namespace SchoolManagement.API.Interfaces.Repositories
 
         void Delete(SchoolClass schoolClass);
 
+        Task<bool> NameExistsAsync(string name, int? excludeClassId = null);
+
+        Task<bool> HasStudentsAsync(int classId);
+
+        Task<bool> HasTeachingAssignmentsAsync(int classId);
+
         Task SaveChangesAsync();
     }
 }

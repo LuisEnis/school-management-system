@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using SchoolManagement.API.DTOs.SchoolClasses;
 using SchoolManagement.API.Entities;
+using SchoolManagement.API.Exceptions;
 using SchoolManagement.API.Interfaces.Repositories;
 using SchoolManagement.API.Interfaces.Services;
+using SchoolManagement.API.Repositories;
 
 namespace SchoolManagement.API.Services
 {
@@ -38,6 +40,16 @@ namespace SchoolManagement.API.Services
 
         public async Task<SchoolClassDto> CreateAsync(CreateSchoolClassDto dto)
         {
+            var nameExists =
+                await _schoolClassRepository
+                    .NameExistsAsync(dto.Name);
+
+            if (nameExists)
+            {
+                throw new ConflictException(
+                    "A class with this name already exists.");
+            }
+
             var schoolClass = _mapper.Map<SchoolClass>(dto);
 
             await _schoolClassRepository.AddAsync(schoolClass);
@@ -52,6 +64,16 @@ namespace SchoolManagement.API.Services
 
             if (schoolClass == null)
                 return false;
+
+            var nameExists =
+                await _schoolClassRepository
+                    .NameExistsAsync(dto.Name, id);
+
+            if (nameExists)
+            {
+                throw new ConflictException(
+                    "A class with this name already exists.");
+            }
 
             _mapper.Map(dto, schoolClass);
 
@@ -68,6 +90,21 @@ namespace SchoolManagement.API.Services
 
             if (schoolClass == null)
                 return false;
+
+            var hasStudents =
+                await _schoolClassRepository
+                    .HasStudentsAsync(id);
+
+            var hasAssignments =
+                await _schoolClassRepository
+                    .HasTeachingAssignmentsAsync(id);
+
+
+            if (hasStudents || hasAssignments)
+            {
+                throw new ConflictException(
+                    "Cannot delete class because it has active assignments.");
+            }
 
             _schoolClassRepository.Delete(schoolClass);
 

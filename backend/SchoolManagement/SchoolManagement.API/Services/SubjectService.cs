@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using SchoolManagement.API.DTOs.Subjects;
 using SchoolManagement.API.Entities;
+using SchoolManagement.API.Exceptions;
 using SchoolManagement.API.Interfaces.Repositories;
 using SchoolManagement.API.Interfaces.Services;
+using SchoolManagement.API.Repositories;
 
 namespace SchoolManagement.API.Services
 {
@@ -38,6 +40,16 @@ namespace SchoolManagement.API.Services
 
         public async Task<SubjectDto> CreateAsync(CreateSubjectDto dto)
         {
+            var nameExists =
+                await _subjectRepository
+                    .NameExistsAsync(dto.Name);
+
+            if (nameExists)
+            {
+                throw new ConflictException(
+                    "A subject with this name already exists.");
+            }
+
             var subject = _mapper.Map<Subject>(dto);
 
             await _subjectRepository.AddAsync(subject);
@@ -52,6 +64,16 @@ namespace SchoolManagement.API.Services
 
             if (subject == null)
                 return false;
+
+            var nameExists =
+                await _subjectRepository
+                    .NameExistsAsync(dto.Name, id);
+
+            if (nameExists)
+            {
+                throw new ConflictException(
+                    "A subject with this name already exists.");
+            }
 
             _mapper.Map(dto, subject);
 
@@ -68,6 +90,22 @@ namespace SchoolManagement.API.Services
 
             if (subject == null)
                 return false;
+
+            var hasTeachers =
+                await _subjectRepository
+                    .HasTeacherAssignmentsAsync(id);
+
+
+            var hasClasses =
+                await _subjectRepository
+                    .HasTeachingAssignmentsAsync(id);
+
+
+            if (hasTeachers || hasClasses)
+            {
+                throw new ConflictException(
+                    "Cannot delete subject because it has active assignments.");
+            }
 
             _subjectRepository.Delete(subject);
 

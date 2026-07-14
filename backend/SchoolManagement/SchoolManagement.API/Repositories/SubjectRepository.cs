@@ -41,6 +41,27 @@ namespace SchoolManagement.API.Repositories
             _context.Subjects.Remove(subject);
         }
 
+        public async Task<bool> NameExistsAsync(string name, int? excludeSubjectId = null)
+        {
+            return await _context.Subjects
+                .AnyAsync(s =>
+                    s.Name == name &&
+                    (!excludeSubjectId.HasValue ||
+                     s.Id != excludeSubjectId.Value));
+        }
+
+        public async Task<bool> HasTeacherAssignmentsAsync(int subjectId)
+        {
+            return await _context.TeacherSubjects
+                .AnyAsync(ts => ts.SubjectId == subjectId);
+        }
+
+        public async Task<bool> HasTeachingAssignmentsAsync(int subjectId)
+        {
+            return await _context.TeachingAssignments
+                .AnyAsync(ta => ta.SubjectId == subjectId);
+        }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

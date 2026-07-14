@@ -8,6 +8,6 @@ namespace SchoolManagement.API.DTOs.Assignments
         public int StudentId { get; set; }
 
         [Range(1, int.MaxValue)]
-        public int ClassId { get; set; }
+        public int SchoolClassId { get; set; }
     }
 }

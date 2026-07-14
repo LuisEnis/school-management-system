@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using SchoolManagement.API.DTOs.Assignments;
 using SchoolManagement.API.Entities;
+using SchoolManagement.API.Enums;
+using SchoolManagement.API.Exceptions;
 using SchoolManagement.API.Interfaces.Repositories;
 using SchoolManagement.API.Interfaces.Services;
 
@@ -9,18 +11,51 @@ namespace SchoolManagement.API.Services
     public class AssignmentService : IAssignmentService
     {
         private readonly IAssignmentRepository _assignmentRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly ISubjectRepository _subjectRepository;
+        private readonly ISchoolClassRepository _schoolClassRepository;
         private readonly IMapper _mapper;
 
 
-        public AssignmentService(IAssignmentRepository assignmentRepository, IMapper mapper)
+        public AssignmentService(IAssignmentRepository assignmentRepository, IUserRepository userRepository, ISubjectRepository subjectRepository, ISchoolClassRepository schoolClassRepository, IMapper mapper)
         {
             _assignmentRepository = assignmentRepository;
+            _userRepository = userRepository;
+            _subjectRepository = subjectRepository;
+            _schoolClassRepository = schoolClassRepository;
             _mapper = mapper;
         }
 
 
         public async Task<StudentClassAssignmentDto> AssignStudentToClassAsync(CreateStudentClassAssignmentDto dto)
         {
+            var student =
+                await _userRepository
+                    .GetByIdAsync(dto.StudentId);
+
+            if (student == null)
+            {
+                throw new NotFoundException(
+                    "Student not found.");
+            }
+
+
+            if (student.Role != UserRole.Student)
+            {
+                throw new BadRequestException(
+                    "User is not a student.");
+            }
+
+            var schoolClass =
+                await _schoolClassRepository
+                    .GetByIdAsync(dto.SchoolClassId);
+
+            if (schoolClass == null)
+            {
+                throw new NotFoundException(
+                    "Class not found.");
+            }
+
             var alreadyAssigned =
                 await _assignmentRepository
                     .StudentAlreadyAssignedToClassAsync(
@@ -28,10 +63,9 @@ namespace SchoolManagement.API.Services
 
             if (alreadyAssigned)
             {
-                throw new Exception(
-                    "Student is already assigned to a class.");
+                throw new BadRequestException(
+                    "Student already belongs to a class.");
             }
-
 
             var entity = _mapper.Map<StudentClass>(dto);
 
@@ -47,6 +81,33 @@ namespace SchoolManagement.API.Services
 
         public async Task<TeacherSubjectAssignmentDto> AssignTeacherToSubjectAsync(CreateTeacherSubjectAssignmentDto dto)
         {
+            var teacher =
+                await _userRepository
+                    .GetByIdAsync(dto.TeacherId);
+
+            if (teacher == null)
+            {
+                throw new NotFoundException(
+                    "Teacher not found.");
+            }
+
+
+            if (teacher.Role != UserRole.Teacher)
+            {
+                throw new BadRequestException(
+                    "User is not a teacher.");
+            }
+
+            var subject =
+                await _subjectRepository
+                    .GetByIdAsync(dto.SubjectId);
+
+            if (subject == null)
+            {
+                throw new NotFoundException(
+                    "Subject not found.");
+            }
+
             var exists =
                 await _assignmentRepository
                     .GetTeacherSubjectAsync(
@@ -56,10 +117,9 @@ namespace SchoolManagement.API.Services
 
             if (exists != null)
             {
-                throw new Exception(
+                throw new ConflictException(
                     "Teacher is already assigned to this subject.");
             }
-
 
             var entity = _mapper.Map<TeacherSubject>(dto);
 
@@ -75,6 +135,43 @@ namespace SchoolManagement.API.Services
 
         public async Task<TeachingAssignmentDto> AssignTeacherToClassSubjectAsync(CreateTeachingAssignmentDto dto)
         {
+            var teacher =
+                await _userRepository
+                    .GetByIdAsync(dto.TeacherId);
+
+            if (teacher == null)
+            {
+                throw new NotFoundException(
+                    "Teacher not found.");
+            }
+
+
+            if (teacher.Role != UserRole.Teacher)
+            {
+                throw new BadRequestException(
+                    "User is not a teacher.");
+            }
+
+            var subject =
+                await _subjectRepository
+                    .GetByIdAsync(dto.SubjectId);
+
+            if (subject == null)
+            {
+                throw new NotFoundException(
+                    "Subject not found.");
+            }
+
+            var schoolClass =
+                await _schoolClassRepository
+                    .GetByIdAsync(dto.SchoolClassId);
+
+            if (schoolClass == null)
+            {
+                throw new NotFoundException(
+                    "Class not found.");
+            }
+
             var teacherCanTeach =
                 await _assignmentRepository
                     .TeacherCanTeachSubjectAsync(
@@ -84,7 +181,7 @@ namespace SchoolManagement.API.Services
 
             if (!teacherCanTeach)
             {
-                throw new Exception(
+                throw new BadRequestException(
                     "Teacher is not assigned to this subject.");
             }
 
@@ -98,7 +195,7 @@ namespace SchoolManagement.API.Services
 
             if (subjectAlreadyAssigned)
             {
-                throw new Exception(
+                throw new ConflictException(
                     "This subject is already assigned to this class.");
             }
 
@@ -138,10 +235,28 @@ namespace SchoolManagement.API.Services
         {
             var assignment =
                 await _assignmentRepository
-                    .GetTeacherSubjectAsync(teacherId, subjectId);
+                    .GetTeacherSubjectAsync(
+                        teacherId,
+                        subjectId);
+
 
             if (assignment == null)
                 return false;
+
+
+            var isTeaching =
+                await _assignmentRepository
+                    .HasTeachingAssignmentAsync(
+                        teacherId,
+                        subjectId);
+
+
+            if (isTeaching)
+            {
+                throw new ConflictException(
+                    "Teacher cannot be removed from this subject because they are currently teaching it.");
+            }
+
 
             _assignmentRepository.DeleteTeacherSubject(assignment);
 

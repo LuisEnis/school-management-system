@@ -2,6 +2,7 @@
 using SchoolManagement.API.DTOs.Users;
 using SchoolManagement.API.Entities;
 using SchoolManagement.API.Enums;
+using SchoolManagement.API.Exceptions;
 using SchoolManagement.API.Interfaces.Repositories;
 using SchoolManagement.API.Interfaces.Services;
 
@@ -46,6 +47,16 @@ namespace SchoolManagement.API.Services
 
         public async Task<UserDto> CreateAsync(CreateUserDto dto)
         {
+            var emailExists =
+                await _userRepository
+                    .EmailExistsAsync(dto.Email);
+
+            if (emailExists)
+            {
+                throw new ConflictException(
+                    "Email already exists.");
+            }
+
             var user = _mapper.Map<User>(dto);
 
             await _userRepository.AddAsync(user);
@@ -60,6 +71,18 @@ namespace SchoolManagement.API.Services
 
             if (user == null)
                 return false;
+
+            var emailExists =
+                await _userRepository
+                    .EmailExistsAsync(
+                        dto.Email,
+                        id);
+
+            if (emailExists)
+            {
+                throw new ConflictException(
+                    "Email already exists.");
+            }
 
             _mapper.Map(dto, user);
 
@@ -76,6 +99,37 @@ namespace SchoolManagement.API.Services
 
             if (user == null)
                 return false;
+
+            if (user.Role == UserRole.Student)
+            {
+                var hasClass =
+                    await _userRepository
+                        .HasStudentClassAssignmentAsync(id);
+
+                if (hasClass)
+                {
+                    throw new ConflictException(
+                        "Cannot delete student because they are assigned to a class.");
+                }
+            }
+
+            if (user.Role == UserRole.Teacher)
+            {
+                var hasSubjects =
+                    await _userRepository
+                        .HasTeacherSubjectAssignmentsAsync(id);
+
+                var hasTeaching =
+                    await _userRepository
+                        .HasTeachingAssignmentsAsync(id);
+
+
+                if (hasSubjects || hasTeaching)
+                {
+                    throw new ConflictException(
+                        "Cannot delete teacher because they have active assignments.");
+                }
+            }
 
             _userRepository.Delete(user);
 

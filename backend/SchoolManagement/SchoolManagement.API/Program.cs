@@ -4,6 +4,7 @@ using SchoolManagement.API.Data;
 using SchoolManagement.API.Interfaces.Repositories;
 using SchoolManagement.API.Interfaces.Services;
 using SchoolManagement.API.Mappings;
+using SchoolManagement.API.Middleware;
 using SchoolManagement.API.Repositories;
 using SchoolManagement.API.Services;
 
@@ -49,6 +50,8 @@ namespace SchoolManagement.API
             }
 
             app.UseHttpsRedirection();
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.UseAuthorization();
 
