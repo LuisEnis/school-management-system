@@ -11,13 +11,16 @@ namespace SchoolManagement.API.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IPasswordHasherService _passwordHasherService;
         private readonly IMapper _mapper;
 
         public UserService(
             IUserRepository userRepository,
+            IPasswordHasherService passwordHasherService,
             IMapper mapper)
         {
             _userRepository = userRepository;
+            _passwordHasherService = passwordHasherService;
             _mapper = mapper;
         }
 
@@ -58,6 +61,12 @@ namespace SchoolManagement.API.Services
             }
 
             var user = _mapper.Map<User>(dto);
+
+            user.PasswordHash =
+                _passwordHasherService
+                    .HashPassword(
+                        user,
+                        dto.Password);
 
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();

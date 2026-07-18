@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.API.DTOs.Assignments;
 using SchoolManagement.API.Interfaces.Services;
 
@@ -6,6 +7,7 @@ namespace SchoolManagement.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "Management")]
     public class AssignmentsController : ControllerBase
     {
         private readonly IAssignmentService _assignmentService;

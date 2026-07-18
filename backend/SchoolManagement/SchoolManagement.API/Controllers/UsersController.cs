@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.API.DTOs.Users;
 using SchoolManagement.API.Enums;
 using SchoolManagement.API.Interfaces.Services;
@@ -7,6 +8,7 @@ namespace SchoolManagement.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "DirectorOnly")]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -17,6 +19,7 @@ namespace SchoolManagement.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Director")]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
         {
             var users = await _userService.GetAllAsync();
