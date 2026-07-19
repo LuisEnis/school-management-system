@@ -57,6 +57,9 @@ namespace SchoolManagement.API.Middleware
                 UnauthorizedException =>
                     HttpStatusCode.Unauthorized,
 
+                ForbiddenException =>
+                    HttpStatusCode.Forbidden,
+
                 _ =>
                     HttpStatusCode.InternalServerError
             };

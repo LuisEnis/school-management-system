@@ -1,7 +1,9 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using SchoolManagement.API.DTOs.Auth;
 using SchoolManagement.API.Entities;
 using SchoolManagement.API.Interfaces.Services;
+using SchoolManagement.API.Settings;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -10,24 +12,20 @@ namespace SchoolManagement.API.Services
 {
     public class JwtService : IJwtService
     {
-        private readonly IConfiguration _configuration;
+        private readonly JwtSettings _jwtSettings;
 
-        public JwtService(IConfiguration configuration)
+        public JwtService(IOptions<JwtSettings> jwtOptions)
         {
-            _configuration = configuration;
+            _jwtSettings = jwtOptions.Value;
         }
 
 
         public JwtTokenResultDto GenerateToken(User user)
         {
-            var jwtSettings =
-                _configuration.GetSection("Jwt");
-
-
             var key =
                 new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(
-                        jwtSettings["Key"]!));
+                        _jwtSettings.Key));
 
 
             var credentials =
@@ -39,7 +37,7 @@ namespace SchoolManagement.API.Services
             var claims = new[]
             {
                 new Claim(
-                    JwtRegisteredClaimNames.Sub,
+                    ClaimTypes.NameIdentifier,
                     user.Id.ToString()),
 
                 new Claim(
@@ -53,13 +51,12 @@ namespace SchoolManagement.API.Services
 
             var expiration =
                 DateTime.UtcNow.AddMinutes(
-                    double.Parse(
-                        jwtSettings["ExpiryMinutes"]!));
+                        _jwtSettings.ExpiryMinutes);
 
             var jwtToken =
                 new JwtSecurityToken(
-                    issuer: jwtSettings["Issuer"],
-                    audience: jwtSettings["Audience"],
+                    issuer: _jwtSettings.Issuer,
+                    audience: _jwtSettings.Audience,
                     claims: claims,
                     expires: expiration,
                     signingCredentials: credentials);

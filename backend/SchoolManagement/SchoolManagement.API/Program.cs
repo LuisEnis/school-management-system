@@ -1,8 +1,8 @@
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using Microsoft.OpenApi;
 using SchoolManagement.API.Data;
 using SchoolManagement.API.Interfaces.Repositories;
 using SchoolManagement.API.Interfaces.Services;
@@ -10,6 +10,9 @@ using SchoolManagement.API.Mappings;
 using SchoolManagement.API.Middleware;
 using SchoolManagement.API.Repositories;
 using SchoolManagement.API.Services;
+using SchoolManagement.API.Settings;
+using System.Reflection;
+using System.Text;
 
 namespace SchoolManagement.API
 {
@@ -28,6 +31,45 @@ namespace SchoolManagement.API
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+            builder.Services.AddEndpointsApiExplorer();
+
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "School Management API",
+                    Version = "v1",
+                    Description = "Backend API for the School Management System portfolio project."
+                });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+
+                var xmlPath =
+                    Path.Combine(
+                        AppContext.BaseDirectory,
+                        xmlFile);
+
+                options.IncludeXmlComments(xmlPath);
+
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter your JWT token.\n\nExample: Bearer eyJhbGciOi..."
+                });
+
+                options.AddSecurityRequirement(document =>
+                {
+                    return new OpenApiSecurityRequirement
+                    {
+                        [new OpenApiSecuritySchemeReference("Bearer", document)] =
+                            new List<string>()
+                    };
+                });
+            });
 
             builder.Services.AddAutoMapper(
                 cfg => { },
@@ -38,15 +80,19 @@ namespace SchoolManagement.API
             builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
             builder.Services.AddScoped<ISchoolClassRepository, SchoolClassRepository>();
             builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+            builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ISubjectService, SubjectService>();
             builder.Services.AddScoped<ISchoolClassService, SchoolClassService>();
             builder.Services.AddScoped<IAssignmentService, AssignmentService>();
+            builder.Services.AddScoped<ITeacherService, TeacherService>();
 
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
             builder.Services.AddScoped<IJwtService, JwtService>();
+
+            builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
             builder.Services.AddAuthentication(
                 options =>
@@ -127,7 +173,12 @@ namespace SchoolManagement.API
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-
+                app.UseSwagger();
+                app.UseSwaggerUI(options =>
+                {
+                    options.DocumentTitle = "School Management API";
+                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "School Management API v1");
+                });
             }
 
             app.UseHttpsRedirection();
