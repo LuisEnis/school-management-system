@@ -11,10 +11,10 @@ namespace SchoolManagement.API.Interfaces.Services
 
         Task<UserDetailsDto?> GetByIdAsync(int id);
 
-        Task<UserDto> CreateAsync(CreateUserDto dto);
+        Task<UserDto> CreateAsync(CreateUserDto dto, UserRole currentUserRole);
 
-        Task<bool> UpdateAsync(int id, UpdateUserDto dto);
+        Task<bool> UpdateAsync(int id, UpdateUserDto dto, UserRole currentUserRole);
 
-        Task<bool> DeleteAsync(int id);
+        Task<bool> DeleteAsync(int id, UserRole currentUserRole);
     }
 }

@@ -64,24 +64,6 @@ namespace SchoolManagement.API.Repositories
                      u.Id != excludeUserId.Value));
         }
 
-        public async Task<bool> HasStudentClassAssignmentAsync(int userId)
-        {
-            return await _context.StudentClasses
-                .AnyAsync(sc => sc.StudentId == userId);
-        }
-
-        public async Task<bool> HasTeacherSubjectAssignmentsAsync(int userId)
-        {
-            return await _context.TeacherSubjects
-                .AnyAsync(ts => ts.TeacherId == userId);
-        }
-
-        public async Task<bool> HasTeachingAssignmentsAsync(int userId)
-        {
-            return await _context.TeachingAssignments
-                .AnyAsync(ta => ta.TeacherId == userId);
-        }
-
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

@@ -21,7 +21,9 @@ namespace SchoolManagement.API.Controllers
             _userService = userService;
         }
 
-
+        /// <summary>
+        /// Used to login.
+        /// </summary>
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponseDto>> Login(LoginRequestDto dto)
         {
@@ -32,7 +34,10 @@ namespace SchoolManagement.API.Controllers
             return Ok(response);
         }
 
-
+        /// <summary>
+        /// Used to logout.
+        /// </summary>
+        [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
@@ -50,7 +55,7 @@ namespace SchoolManagement.API.Controllers
         /// </summary>
         [Authorize]
         [HttpGet("me")]
-        public async Task<ActionResult<UserDto>> GetCurrentUser()
+        public async Task<ActionResult<UserDetailsDto>> GetCurrentUser()
         {
             var userIdClaim =
                 User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

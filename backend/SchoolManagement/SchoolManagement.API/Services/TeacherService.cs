@@ -9,16 +9,16 @@ namespace SchoolManagement.API.Services
     public class TeacherService : ITeacherService
     {
         private readonly ITeacherRepository _teacherRepository;
+        private readonly IAssignmentRepository _assignmentRepository;
 
-
-        public TeacherService(
-            ITeacherRepository teacherRepository)
+        public TeacherService(ITeacherRepository teacherRepository, IAssignmentRepository assignmentRepository)
         {
             _teacherRepository = teacherRepository;
+            _assignmentRepository = assignmentRepository;
         }
 
 
-        public async Task<IEnumerable<TeacherClassDto>> GetClassesAsync(int teacherId)
+        public async Task<IEnumerable<TeacherAssignmentDto>> GetClassesAsync(int teacherId)
         {
             return await _teacherRepository
                 .GetTeacherClassesAsync(teacherId);
@@ -27,7 +27,7 @@ namespace SchoolManagement.API.Services
         public async Task<IEnumerable<UserDto>> GetStudentsByClassAsync(int teacherId, int classId)
         {
             var teacherHasClass =
-                await _teacherRepository
+                await _assignmentRepository
                     .TeacherHasClassAsync(
                         teacherId,
                         classId);

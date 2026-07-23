@@ -81,12 +81,14 @@ namespace SchoolManagement.API
             builder.Services.AddScoped<ISchoolClassRepository, SchoolClassRepository>();
             builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
             builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+            builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ISubjectService, SubjectService>();
             builder.Services.AddScoped<ISchoolClassService, SchoolClassService>();
             builder.Services.AddScoped<IAssignmentService, AssignmentService>();
             builder.Services.AddScoped<ITeacherService, TeacherService>();
+            builder.Services.AddScoped<IStudentService, StudentService>();
 
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
@@ -166,6 +168,14 @@ namespace SchoolManagement.API
                     policy =>
                         policy.RequireRole(
                             "Student"));
+
+                options.AddPolicy(
+                    "ClassView",
+                    policy =>
+                        policy.RequireRole(
+                            "Director",
+                            "Secretary",
+                            "Teacher"));
             });
 
             var app = builder.Build();

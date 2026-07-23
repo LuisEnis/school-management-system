@@ -5,7 +5,7 @@ namespace SchoolManagement.API.Interfaces.Services
 {
     public interface ITeacherService
     {
-        Task<IEnumerable<TeacherClassDto>> GetClassesAsync(int teacherId);
+        Task<IEnumerable<TeacherAssignmentDto>> GetClassesAsync(int teacherId);
 
         Task<IEnumerable<UserDto>> GetStudentsByClassAsync(int teacherId, int classId);
     }

@@ -11,15 +11,18 @@ namespace SchoolManagement.API.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IAssignmentRepository _assignmentRepository;
         private readonly IPasswordHasherService _passwordHasherService;
         private readonly IMapper _mapper;
 
         public UserService(
             IUserRepository userRepository,
+            IAssignmentRepository assignmentRepository,
             IPasswordHasherService passwordHasherService,
             IMapper mapper)
         {
             _userRepository = userRepository;
+            _assignmentRepository = assignmentRepository;
             _passwordHasherService = passwordHasherService;
             _mapper = mapper;
         }
@@ -48,8 +51,13 @@ namespace SchoolManagement.API.Services
             return _mapper.Map<UserDetailsDto>(user);
         }
 
-        public async Task<UserDto> CreateAsync(CreateUserDto dto)
+        public async Task<UserDto> CreateAsync(CreateUserDto dto, UserRole currentUserRole)
         {
+            if (currentUserRole == UserRole.Secretary && dto.Role != UserRole.Student)
+            {
+                throw new ForbiddenException("Secretaries can only create students.");
+            }
+
             var emailExists =
                 await _userRepository
                     .EmailExistsAsync(dto.Email);
@@ -74,12 +82,17 @@ namespace SchoolManagement.API.Services
             return _mapper.Map<UserDto>(user);
         }
 
-        public async Task<bool> UpdateAsync(int id, UpdateUserDto dto)
+        public async Task<bool> UpdateAsync(int id, UpdateUserDto dto, UserRole currentUserRole)
         {
             var user = await _userRepository.GetByIdAsync(id);
 
             if (user == null)
                 return false;
+
+            if (currentUserRole == UserRole.Secretary && user.Role != UserRole.Student)
+            {
+                throw new ForbiddenException("Secretaries can only manage students.");
+            }
 
             var emailExists =
                 await _userRepository
@@ -102,18 +115,23 @@ namespace SchoolManagement.API.Services
             return true;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id, UserRole currentUserRole)
         {
             var user = await _userRepository.GetByIdAsync(id);
 
             if (user == null)
                 return false;
 
+            if (currentUserRole == UserRole.Secretary && user.Role != UserRole.Student)
+            {
+                throw new ForbiddenException("Secretaries can only delete students.");
+            }
+
             if (user.Role == UserRole.Student)
             {
                 var hasClass =
-                    await _userRepository
-                        .HasStudentClassAssignmentAsync(id);
+                    await _assignmentRepository
+                        .StudentHasClassAssignmentAsync(id);
 
                 if (hasClass)
                 {
@@ -125,12 +143,12 @@ namespace SchoolManagement.API.Services
             if (user.Role == UserRole.Teacher)
             {
                 var hasSubjects =
-                    await _userRepository
-                        .HasTeacherSubjectAssignmentsAsync(id);
+                    await _assignmentRepository
+                        .TeacherHasSubjectAssignmentsAsync(id);
 
                 var hasTeaching =
-                    await _userRepository
-                        .HasTeachingAssignmentsAsync(id);
+                    await _assignmentRepository
+                        .TeacherHasTeachingAssignmentsAsync(id);
 
 
                 if (hasSubjects || hasTeaching)

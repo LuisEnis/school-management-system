@@ -1,6 +1,6 @@
 ﻿namespace SchoolManagement.API.DTOs.Teacher
 {
-    public class TeacherClassDto
+    public class TeacherAssignmentDto
     {
         public int ClassId { get; set; }
 

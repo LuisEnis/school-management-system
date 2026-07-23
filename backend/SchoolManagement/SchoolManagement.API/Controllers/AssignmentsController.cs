@@ -18,7 +18,9 @@ namespace SchoolManagement.API.Controllers
             _assignmentService = assignmentService;
         }
 
-
+        /// <summary>
+        /// Assigns a student to a class using their ids.
+        /// </summary>
         [HttpPost("student-class")]
         public async Task<IActionResult> AssignStudentToClass(
             CreateStudentClassAssignmentDto dto)
@@ -32,7 +34,9 @@ namespace SchoolManagement.API.Controllers
                 result);
         }
 
-
+        /// <summary>
+        /// Assigns a teacher to a subject using their ids.
+        /// </summary>
         [HttpPost("teacher-subject")]
         public async Task<IActionResult> AssignTeacherToSubject(
             CreateTeacherSubjectAssignmentDto dto)
@@ -46,7 +50,9 @@ namespace SchoolManagement.API.Controllers
                 result);
         }
 
-
+        /// <summary>
+        /// Creates a connection between a teacher that teaches a certain subject and the class where he will teach it using their ids.
+        /// </summary>
         [HttpPost("teaching-assignment")]
         public async Task<IActionResult> AssignTeachingAssignment(
             CreateTeachingAssignmentDto dto)
@@ -61,7 +67,9 @@ namespace SchoolManagement.API.Controllers
         }
 
 
-
+        /// <summary>
+        /// Deletes the connection between a student and a class.
+        /// </summary>
         [HttpDelete("student-class")]
         public async Task<IActionResult> RemoveStudentFromClass(
             int studentId,
@@ -80,7 +88,9 @@ namespace SchoolManagement.API.Controllers
         }
 
 
-
+        /// <summary>
+        /// Deletes the connection between a teacher and a subject.
+        /// </summary>
         [HttpDelete("teacher-subject")]
         public async Task<IActionResult> RemoveTeacherFromSubject(
             int teacherId,
@@ -99,7 +109,9 @@ namespace SchoolManagement.API.Controllers
         }
 
 
-
+        /// <summary>
+        /// Deletes the connection between a teacher that teaches a certain subject and the class where he teaches it.
+        /// </summary>
         [HttpDelete("teaching-assignment")]
         public async Task<IActionResult> RemoveTeachingAssignment(
             int schoolClassId,

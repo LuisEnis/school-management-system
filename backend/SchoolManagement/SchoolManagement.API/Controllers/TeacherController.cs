@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.API.DTOs.Teacher;
 using SchoolManagement.API.DTOs.Users;
-using SchoolManagement.API.Entities;
 using SchoolManagement.API.Interfaces.Services;
 using System.Security.Claims;
 
@@ -22,9 +21,11 @@ namespace SchoolManagement.API.Controllers
             _teacherService = teacherService;
         }
 
-
+        /// <summary>
+        /// Show the classes where this teacher teaches and which subject the teacher teaches in that class.
+        /// </summary>
         [HttpGet("classes")]
-        public async Task<ActionResult<IEnumerable<TeacherClassDto>>> GetClasses()
+        public async Task<ActionResult<IEnumerable<TeacherAssignmentDto>>> GetClasses()
         {
             var teacherId =
                 int.Parse(
@@ -40,6 +41,9 @@ namespace SchoolManagement.API.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Shows the students in a class where the teacher teaches.
+        /// </summary>
         [HttpGet("classes/{classId}/students")]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetStudentsByClass(int classId)
         {

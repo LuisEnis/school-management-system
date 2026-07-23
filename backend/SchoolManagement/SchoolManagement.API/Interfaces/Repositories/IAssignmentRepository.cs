@@ -31,6 +31,23 @@ namespace SchoolManagement.API.Interfaces.Repositories
         Task<bool> StudentAlreadyAssignedToClassAsync(int studentId);
 
         Task<bool> HasTeachingAssignmentAsync(int teacherId, int subjectId);
+
+        Task<bool> TeacherHasClassAsync(int teacherId, int classId);
+
+        Task<bool> StudentHasClassAssignmentAsync(int userId);
+
+        Task<bool> TeacherHasSubjectAssignmentsAsync(int userId);
+
+        Task<bool> TeacherHasTeachingAssignmentsAsync(int userId);
+
+        Task<bool> SubjectHasTeacherAssignmentsAsync(int subjectId);
+
+        Task<bool> SubjectHasTeachingAssignmentsAsync(int subjectId);
+
+        Task<bool> ClassHasStudentsAsync(int classId);
+
+        Task<bool> ClassHasTeachingAssignmentsAsync(int classId);
+
         Task SaveChangesAsync();
     }
 }

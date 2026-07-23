@@ -17,6 +17,9 @@ namespace SchoolManagement.API.Controllers
             _subjectService = subjectService;
         }
 
+        /// <summary>
+        /// Retrieves all subjects.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SubjectDto>>> GetAll()
         {
@@ -25,6 +28,9 @@ namespace SchoolManagement.API.Controllers
             return Ok(subjects);
         }
 
+        /// <summary>
+        /// Retrieves subject by id.
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<SubjectDto>> GetById(int id)
         {
@@ -36,6 +42,9 @@ namespace SchoolManagement.API.Controllers
             return Ok(subject);
         }
 
+        /// <summary>
+        /// Creates a new subject.
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<SubjectDto>> Create(CreateSubjectDto dto)
         {
@@ -47,6 +56,9 @@ namespace SchoolManagement.API.Controllers
                 subject);
         }
 
+        /// <summary>
+        /// Updates an existing subject.
+        /// </summary>
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateSubjectDto dto)
         {
@@ -58,6 +70,9 @@ namespace SchoolManagement.API.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Deletes a subject.
+        /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

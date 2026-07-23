@@ -2,12 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.API.DTOs.SchoolClasses;
 using SchoolManagement.API.Interfaces.Services;
+using System.Security.Claims;
 
 namespace SchoolManagement.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Policy = "Management")]
     public class SchoolClassesController : ControllerBase
     {
         private readonly ISchoolClassService _schoolClassService;
@@ -18,7 +18,11 @@ namespace SchoolManagement.API.Controllers
             _schoolClassService = schoolClassService;
         }
 
+        /// <summary>
+        /// Gets all the classes.
+        /// </summary>
         [HttpGet]
+        [Authorize(Policy = "Management")]
         public async Task<ActionResult<IEnumerable<SchoolClassDto>>> GetAll()
         {
             var classes = await _schoolClassService.GetAllAsync();
@@ -26,7 +30,11 @@ namespace SchoolManagement.API.Controllers
             return Ok(classes);
         }
 
+        /// <summary>
+        /// Gets a class through its id.
+        /// </summary>
         [HttpGet("{id}")]
+        [Authorize(Policy = "Management")]
         public async Task<ActionResult<SchoolClassDto>> GetById(int id)
         {
             var schoolClass = await _schoolClassService.GetByIdAsync(id);
@@ -37,7 +45,11 @@ namespace SchoolManagement.API.Controllers
             return Ok(schoolClass);
         }
 
+        /// <summary>
+        /// Creates a new class.
+        /// </summary>
         [HttpPost]
+        [Authorize(Policy = "Management")]
         public async Task<ActionResult<SchoolClassDto>> Create(CreateSchoolClassDto dto)
         {
             var schoolClass = await _schoolClassService.CreateAsync(dto);
@@ -48,7 +60,11 @@ namespace SchoolManagement.API.Controllers
                 schoolClass);
         }
 
+        /// <summary>
+        /// Updates an existing class.
+        /// </summary>
         [HttpPut("{id}")]
+        [Authorize(Policy = "Management")]
         public async Task<IActionResult> Update(int id, UpdateSchoolClassDto dto)
         {
             var result = await _schoolClassService.UpdateAsync(id, dto);
@@ -59,7 +75,11 @@ namespace SchoolManagement.API.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Deletes a class.
+        /// </summary>
         [HttpDelete("{id}")]
+        [Authorize(Policy = "Management")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _schoolClassService.DeleteAsync(id);
@@ -68,6 +88,39 @@ namespace SchoolManagement.API.Controllers
                 return NotFound();
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Gets the class details.
+        /// </summary>
+        [HttpGet("{id}/details")]
+        [Authorize(Policy = "ClassView")]
+        public async Task<ActionResult<ClassDetailsDto>> GetDetails(int id)
+        {
+            int? teacherId = null;
+
+
+            if (User.IsInRole("Teacher"))
+            {
+                teacherId =
+                    int.Parse(
+                        User.FindFirst(
+                            ClaimTypes.NameIdentifier)!.Value);
+            }
+
+
+            var result =
+                await _schoolClassService
+                    .GetClassDetailsAsync(
+                        id,
+                        teacherId);
+
+
+            if (result == null)
+                return NotFound();
+
+
+            return Ok(result);
         }
     }
 }

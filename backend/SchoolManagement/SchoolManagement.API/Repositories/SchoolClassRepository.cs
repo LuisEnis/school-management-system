@@ -50,21 +50,21 @@ namespace SchoolManagement.API.Repositories
                      c.Id != excludeClassId.Value));
         }
 
-        public async Task<bool> HasStudentsAsync(int classId)
-        {
-            return await _context.StudentClasses
-                .AnyAsync(sc => sc.SchoolClassId == classId);
-        }
-
-        public async Task<bool> HasTeachingAssignmentsAsync(int classId)
-        {
-            return await _context.TeachingAssignments
-                .AnyAsync(ta => ta.SchoolClassId == classId);
-        }
-
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<SchoolClass?> GetClassDetailsAsync(int classId)
+        {
+            return await _context.SchoolClasses
+                .Include(c => c.StudentClasses)
+                    .ThenInclude(sc => sc.Student)
+                .Include(c => c.TeachingAssignments)
+                    .ThenInclude(ta => ta.Subject)
+                .Include(c => c.TeachingAssignments)
+                    .ThenInclude(ta => ta.Teacher)
+                .FirstOrDefaultAsync(c => c.Id == classId);
         }
     }
 }

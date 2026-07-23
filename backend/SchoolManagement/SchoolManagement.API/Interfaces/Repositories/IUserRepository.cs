@@ -21,12 +21,6 @@ namespace SchoolManagement.API.Interfaces.Repositories
 
         Task<bool> EmailExistsAsync(string email, int? excludeUserId = null);
 
-        Task<bool> HasStudentClassAssignmentAsync(int userId);
-
-        Task<bool> HasTeacherSubjectAssignmentsAsync(int userId);
-
-        Task<bool> HasTeachingAssignmentsAsync(int userId);
-
         Task SaveChangesAsync();
     }
 }

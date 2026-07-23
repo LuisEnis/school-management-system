@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SchoolManagement.API.DTOs.SchoolClasses;
+using SchoolManagement.API.DTOs.Users;
 using SchoolManagement.API.Entities;
 using SchoolManagement.API.Exceptions;
 using SchoolManagement.API.Interfaces.Repositories;
@@ -11,13 +12,16 @@ namespace SchoolManagement.API.Services
     public class SchoolClassService : ISchoolClassService
     {
         private readonly ISchoolClassRepository _schoolClassRepository;
+        private readonly IAssignmentRepository _assignmentRepository;
         private readonly IMapper _mapper;
 
         public SchoolClassService(
             ISchoolClassRepository schoolClassRepository,
+            IAssignmentRepository assignmentRepository,
             IMapper mapper)
         {
             _schoolClassRepository = schoolClassRepository;
+            _assignmentRepository = assignmentRepository;
             _mapper = mapper;
         }
 
@@ -92,12 +96,12 @@ namespace SchoolManagement.API.Services
                 return false;
 
             var hasStudents =
-                await _schoolClassRepository
-                    .HasStudentsAsync(id);
+                await _assignmentRepository
+                    .ClassHasStudentsAsync(id);
 
             var hasAssignments =
-                await _schoolClassRepository
-                    .HasTeachingAssignmentsAsync(id);
+                await _assignmentRepository
+                    .TeacherHasTeachingAssignmentsAsync(id);
 
 
             if (hasStudents || hasAssignments)
@@ -111,6 +115,57 @@ namespace SchoolManagement.API.Services
             await _schoolClassRepository.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<ClassDetailsDto?> GetClassDetailsAsync(int classId, int? teacherId = null)
+        {
+            if (teacherId.HasValue)
+            {
+                var hasAccess =
+                    await _assignmentRepository
+                        .TeacherHasClassAsync(
+                            teacherId.Value,
+                            classId);
+
+                if (!hasAccess)
+                {
+                    throw new ForbiddenException(
+                        "You are not assigned to this class.");
+                }
+            }
+
+
+            var schoolClass =
+                await _schoolClassRepository
+                    .GetClassDetailsAsync(classId);
+
+
+            if (schoolClass == null)
+                return null;
+
+
+            return new ClassDetailsDto
+            {
+                Id = schoolClass.Id,
+
+                Name = schoolClass.Name,
+
+                Students = _mapper.Map<List<UserDto>>(
+                    schoolClass.StudentClasses
+                        .Select(sc => sc.Student)
+                        .ToList()),
+
+                Subjects =
+                    schoolClass.TeachingAssignments
+                    .Select(ta => new StudentSubjectDto
+                    {
+                        SubjectName = ta.Subject.Name,
+
+                        TeacherName =
+                            $"{ta.Teacher.FirstName} {ta.Teacher.LastName}"
+                    })
+                    .ToList()
+            };
         }
     }
 }

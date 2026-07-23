@@ -11,13 +11,16 @@ namespace SchoolManagement.API.Services
     public class SubjectService : ISubjectService
     {
         private readonly ISubjectRepository _subjectRepository;
+        private readonly IAssignmentRepository _assignmentRepository;
         private readonly IMapper _mapper;
 
         public SubjectService(
             ISubjectRepository subjectRepository,
+            IAssignmentRepository assignmentRepository,
             IMapper mapper)
         {
             _subjectRepository = subjectRepository;
+            _assignmentRepository = assignmentRepository;
             _mapper = mapper;
         }
 
@@ -92,13 +95,13 @@ namespace SchoolManagement.API.Services
                 return false;
 
             var hasTeachers =
-                await _subjectRepository
-                    .HasTeacherAssignmentsAsync(id);
+                await _assignmentRepository
+                    .SubjectHasTeacherAssignmentsAsync(id);
 
 
             var hasClasses =
-                await _subjectRepository
-                    .HasTeachingAssignmentsAsync(id);
+                await _assignmentRepository
+                    .TeacherHasTeachingAssignmentsAsync(id);
 
 
             if (hasTeachers || hasClasses)

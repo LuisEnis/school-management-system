@@ -17,11 +17,11 @@ namespace SchoolManagement.API.Repositories
         }
 
 
-        public async Task<IEnumerable<TeacherClassDto>> GetTeacherClassesAsync(int teacherId)
+        public async Task<IEnumerable<TeacherAssignmentDto>> GetTeacherClassesAsync(int teacherId)
         {
             return await _context.TeachingAssignments
                 .Where(x => x.TeacherId == teacherId)
-                .Select(x => new TeacherClassDto
+                .Select(x => new TeacherAssignmentDto
                 {
                     ClassId = x.SchoolClassId,
 
@@ -32,14 +32,6 @@ namespace SchoolManagement.API.Repositories
                     SubjectName = x.Subject.Name
                 })
                 .ToListAsync();
-        }
-
-        public async Task<bool> TeacherHasClassAsync(int teacherId, int classId)
-        {
-            return await _context.TeachingAssignments
-                .AnyAsync(x =>
-                    x.TeacherId == teacherId &&
-                    x.SchoolClassId == classId);
         }
 
         public async Task<IEnumerable<UserDto>> GetStudentsByClassAsync(int classId)

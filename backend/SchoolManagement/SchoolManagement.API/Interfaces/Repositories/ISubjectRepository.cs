@@ -16,10 +16,6 @@ namespace SchoolManagement.API.Interfaces.Repositories
 
         Task<bool> NameExistsAsync(string name, int? excludeSubjectId = null);
 
-        Task<bool> HasTeacherAssignmentsAsync(int subjectId);
-
-        Task<bool> HasTeachingAssignmentsAsync(int subjectId);
-
         Task SaveChangesAsync();
     }
 }

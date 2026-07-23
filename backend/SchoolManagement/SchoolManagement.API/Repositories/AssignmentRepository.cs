@@ -116,6 +116,58 @@ namespace SchoolManagement.API.Repositories
                     x.SubjectId == subjectId);
         }
 
+        public async Task<bool> TeacherHasClassAsync(int teacherId, int classId)
+        {
+            return await _context.TeachingAssignments
+                .AnyAsync(x =>
+                    x.TeacherId == teacherId &&
+                    x.SchoolClassId == classId);
+        }
+
+        public async Task<bool> StudentHasClassAssignmentAsync(int userId)
+        {
+            return await _context.StudentClasses
+                .AnyAsync(sc => sc.StudentId == userId);
+        }
+
+        public async Task<bool> TeacherHasSubjectAssignmentsAsync(int userId)
+        {
+            return await _context.TeacherSubjects
+                .AnyAsync(ts => ts.TeacherId == userId);
+        }
+
+        public async Task<bool> TeacherHasTeachingAssignmentsAsync(int userId)
+        {
+            return await _context.TeachingAssignments
+                .AnyAsync(ta => ta.TeacherId == userId);
+        }
+
+        public async Task<bool> SubjectHasTeacherAssignmentsAsync(int subjectId)
+        {
+            return await _context.TeacherSubjects
+                .AnyAsync(x => x.SubjectId == subjectId);
+        }
+
+
+        public async Task<bool> SubjectHasTeachingAssignmentsAsync(int subjectId)
+        {
+            return await _context.TeachingAssignments
+                .AnyAsync(x => x.SubjectId == subjectId);
+        }
+
+        public async Task<bool> ClassHasStudentsAsync(int classId)
+        {
+            return await _context.StudentClasses
+                .AnyAsync(x => x.SchoolClassId == classId);
+        }
+
+
+        public async Task<bool> ClassHasTeachingAssignmentsAsync(int classId)
+        {
+            return await _context.TeachingAssignments
+                .AnyAsync(x => x.SchoolClassId == classId);
+        }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

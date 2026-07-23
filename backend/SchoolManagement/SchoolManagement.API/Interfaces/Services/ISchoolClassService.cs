@@ -13,5 +13,7 @@ namespace SchoolManagement.API.Interfaces.Services
         Task<bool> UpdateAsync(int id, UpdateSchoolClassDto dto);
 
         Task<bool> DeleteAsync(int id);
+
+        Task<ClassDetailsDto?> GetClassDetailsAsync(int classId, int? teacherId = null);
     }
 }

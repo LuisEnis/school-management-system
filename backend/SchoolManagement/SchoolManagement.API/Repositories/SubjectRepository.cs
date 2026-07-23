@@ -50,18 +50,6 @@ namespace SchoolManagement.API.Repositories
                      s.Id != excludeSubjectId.Value));
         }
 
-        public async Task<bool> HasTeacherAssignmentsAsync(int subjectId)
-        {
-            return await _context.TeacherSubjects
-                .AnyAsync(ts => ts.SubjectId == subjectId);
-        }
-
-        public async Task<bool> HasTeachingAssignmentsAsync(int subjectId)
-        {
-            return await _context.TeachingAssignments
-                .AnyAsync(ta => ta.SubjectId == subjectId);
-        }
-
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
