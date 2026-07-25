@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.API.DTOs.Users;
 using SchoolManagement.API.Enums;
+using SchoolManagement.API.Exceptions;
 using SchoolManagement.API.Interfaces.Services;
 using System.Security.Claims;
 
@@ -121,6 +122,25 @@ namespace SchoolManagement.API.Controllers
         {
             return Enum.Parse<UserRole>(
                 User.FindFirst(ClaimTypes.Role)!.Value);
+        }
+
+        /// <summary>
+        /// Changes the password of the currently authenticated user.
+        /// </summary>
+        [Authorize]
+        [HttpPut("change-password")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto dto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+                throw new UnauthorizedException("Invalid token.");
+
+            var userId = int.Parse(userIdClaim.Value);
+
+            await _userService.ChangePasswordAsync(userId, dto);
+
+            return NoContent();
         }
     }
 }

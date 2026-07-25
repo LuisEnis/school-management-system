@@ -14,6 +14,6 @@ namespace SchoolManagement.API.Interfaces.Services
 
         Task<bool> DeleteAsync(int id);
 
-        Task<ClassDetailsDto?> GetClassDetailsAsync(int classId, int? teacherId = null);
+        Task<ClassDetailsDto?> GetClassDetailsAsync(int classId);
     }
 }

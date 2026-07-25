@@ -164,5 +164,31 @@ namespace SchoolManagement.API.Services
 
             return true;
         }
+
+        public async Task ChangePasswordAsync(int userId, ChangePasswordDto dto)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+
+            if (user == null)
+                throw new NotFoundException("User not found.");
+
+            var passwordValid = _passwordHasherService.VerifyPassword(
+                user,
+                user.PasswordHash,
+                dto.CurrentPassword);
+
+            if (!passwordValid)
+                throw new BadRequestException("Current password is incorrect.");
+
+            if (dto.NewPassword != dto.ConfirmNewPassword)
+                throw new BadRequestException("New passwords do not match.");
+
+            if (dto.CurrentPassword == dto.NewPassword)
+                throw new BadRequestException("New password must be different from the current password.");
+
+            user.PasswordHash = _passwordHasherService.HashPassword(user, dto.NewPassword);
+
+            await _userRepository.SaveChangesAsync();
+        }
     }
 }

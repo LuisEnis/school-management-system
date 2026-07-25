@@ -1,13 +1,12 @@
-﻿using SchoolManagement.API.DTOs.Teacher;
-using SchoolManagement.API.DTOs.Users;
+﻿using SchoolManagement.API.Entities;
 
 namespace SchoolManagement.API.Interfaces.Repositories
 {
     public interface ITeacherRepository
     {
-        Task<IEnumerable<TeacherAssignmentDto>> GetTeacherClassesAsync(int teacherId);
+        Task<IEnumerable<TeachingAssignment>> GetTeacherClassesAsync(int teacherId);
 
-        Task<IEnumerable<UserDto>> GetStudentsByClassAsync(int classId);
+        Task<IEnumerable<User>> GetStudentsByClassAsync(int classId);
 
     }
 }

@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SchoolManagement.API.Data;
-using SchoolManagement.API.DTOs.Students;
-using SchoolManagement.API.DTOs.Users;
 using SchoolManagement.API.Entities;
 using SchoolManagement.API.Interfaces.Repositories;
 

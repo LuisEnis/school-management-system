@@ -94,26 +94,12 @@ namespace SchoolManagement.API.Controllers
         /// Gets the class details.
         /// </summary>
         [HttpGet("{id}/details")]
-        [Authorize(Policy = "ClassView")]
+        [Authorize(Policy = "Management")]
         public async Task<ActionResult<ClassDetailsDto>> GetDetails(int id)
         {
-            int? teacherId = null;
-
-
-            if (User.IsInRole("Teacher"))
-            {
-                teacherId =
-                    int.Parse(
-                        User.FindFirst(
-                            ClaimTypes.NameIdentifier)!.Value);
-            }
-
-
             var result =
                 await _schoolClassService
-                    .GetClassDetailsAsync(
-                        id,
-                        teacherId);
+                    .GetClassDetailsAsync(id);
 
 
             if (result == null)

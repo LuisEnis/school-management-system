@@ -16,5 +16,7 @@ namespace SchoolManagement.API.Interfaces.Services
         Task<bool> UpdateAsync(int id, UpdateUserDto dto, UserRole currentUserRole);
 
         Task<bool> DeleteAsync(int id, UserRole currentUserRole);
+
+        Task ChangePasswordAsync(int userId, ChangePasswordDto dto);
     }
 }

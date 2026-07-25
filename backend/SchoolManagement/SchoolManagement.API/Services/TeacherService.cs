@@ -1,4 +1,5 @@
-﻿using SchoolManagement.API.DTOs.Teacher;
+﻿using AutoMapper;
+using SchoolManagement.API.DTOs.Teacher;
 using SchoolManagement.API.DTOs.Users;
 using SchoolManagement.API.Exceptions;
 using SchoolManagement.API.Interfaces.Repositories;
@@ -10,18 +11,22 @@ namespace SchoolManagement.API.Services
     {
         private readonly ITeacherRepository _teacherRepository;
         private readonly IAssignmentRepository _assignmentRepository;
+        private readonly IMapper _mapper;
 
-        public TeacherService(ITeacherRepository teacherRepository, IAssignmentRepository assignmentRepository)
+        public TeacherService(ITeacherRepository teacherRepository, IAssignmentRepository assignmentRepository, IMapper mapper)
         {
             _teacherRepository = teacherRepository;
             _assignmentRepository = assignmentRepository;
+            _mapper = mapper;
         }
 
 
         public async Task<IEnumerable<TeacherAssignmentDto>> GetClassesAsync(int teacherId)
         {
-            return await _teacherRepository
+            var assignments = await _teacherRepository
                 .GetTeacherClassesAsync(teacherId);
+
+            return _mapper.Map<IEnumerable<TeacherAssignmentDto>>(assignments);
         }
 
         public async Task<IEnumerable<UserDto>> GetStudentsByClassAsync(int teacherId, int classId)
@@ -32,16 +37,16 @@ namespace SchoolManagement.API.Services
                         teacherId,
                         classId);
 
-
             if (!teacherHasClass)
             {
                 throw new ForbiddenException(
                     "You are not assigned to this class.");
             }
 
-
-            return await _teacherRepository
+            var students = await _teacherRepository
                 .GetStudentsByClassAsync(classId);
+
+            return _mapper.Map<IEnumerable<UserDto>>(students);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SchoolManagement.API.Data;
-using SchoolManagement.API.DTOs.Teacher;
-using SchoolManagement.API.DTOs.Users;
+using SchoolManagement.API.Entities;
 using SchoolManagement.API.Interfaces.Repositories;
 
 namespace SchoolManagement.API.Repositories
@@ -17,40 +16,20 @@ namespace SchoolManagement.API.Repositories
         }
 
 
-        public async Task<IEnumerable<TeacherAssignmentDto>> GetTeacherClassesAsync(int teacherId)
+        public async Task<IEnumerable<TeachingAssignment>> GetTeacherClassesAsync(int teacherId)
         {
             return await _context.TeachingAssignments
+                .Include(x => x.SchoolClass)
+                .Include(x => x.Subject)
                 .Where(x => x.TeacherId == teacherId)
-                .Select(x => new TeacherAssignmentDto
-                {
-                    ClassId = x.SchoolClassId,
-
-                    ClassName = x.SchoolClass.Name,
-
-                    SubjectId = x.SubjectId,
-
-                    SubjectName = x.Subject.Name
-                })
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<UserDto>> GetStudentsByClassAsync(int classId)
+        public async Task<IEnumerable<User>> GetStudentsByClassAsync(int classId)
         {
             return await _context.StudentClasses
-                .Where(x =>
-                    x.SchoolClassId == classId)
-                .Select(x => new UserDto
-                {
-                    Id = x.Student.Id,
-
-                    FirstName = x.Student.FirstName,
-
-                    LastName = x.Student.LastName,
-
-                    Email = x.Student.Email,
-
-                    Role = x.Student.Role
-                })
+                .Where(x => x.SchoolClassId == classId)
+                .Select(x => x.Student)
                 .ToListAsync();
         }
     }

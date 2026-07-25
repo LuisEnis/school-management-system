@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.API.DTOs.Students;
-using SchoolManagement.API.Entities;
 using SchoolManagement.API.Interfaces.Services;
 using System.Security.Claims;
 

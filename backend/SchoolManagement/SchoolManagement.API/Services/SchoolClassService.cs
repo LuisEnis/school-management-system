@@ -5,7 +5,6 @@ using SchoolManagement.API.Entities;
 using SchoolManagement.API.Exceptions;
 using SchoolManagement.API.Interfaces.Repositories;
 using SchoolManagement.API.Interfaces.Services;
-using SchoolManagement.API.Repositories;
 
 namespace SchoolManagement.API.Services
 {
@@ -117,24 +116,8 @@ namespace SchoolManagement.API.Services
             return true;
         }
 
-        public async Task<ClassDetailsDto?> GetClassDetailsAsync(int classId, int? teacherId = null)
+        public async Task<ClassDetailsDto?> GetClassDetailsAsync(int classId)
         {
-            if (teacherId.HasValue)
-            {
-                var hasAccess =
-                    await _assignmentRepository
-                        .TeacherHasClassAsync(
-                            teacherId.Value,
-                            classId);
-
-                if (!hasAccess)
-                {
-                    throw new ForbiddenException(
-                        "You are not assigned to this class.");
-                }
-            }
-
-
             var schoolClass =
                 await _schoolClassRepository
                     .GetClassDetailsAsync(classId);
