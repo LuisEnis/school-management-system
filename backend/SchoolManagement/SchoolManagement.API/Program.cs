@@ -22,6 +22,17 @@ namespace SchoolManagement.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AngularClient", policy =>
+                {
+                    policy
+                        .WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
+
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(
                 builder.Configuration.GetConnectionString("DefaultConnection")
@@ -194,6 +205,8 @@ namespace SchoolManagement.API
             app.UseHttpsRedirection();
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+            app.UseCors("AngularClient");
 
             app.UseAuthentication();
 

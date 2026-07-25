@@ -12,6 +12,8 @@ import { SubjectForm } from './features/subjects/subject-form/subject-form';
 import { SchoolClassList } from './features/schoolClasses/school-class-list/school-class-list';
 import { SchoolClassForm } from './features/schoolClasses/school-class-form/school-class-form';
 import { TeacherSubjectAssignment } from './features/assignments/teacher-subject-assignment/teacher-subject-assignment';
+import { ClassDetails } from './features/schoolClasses/class-details/class-details';
+import { ChangePassword } from './features/auth/change-password/change-password';
 
 export const routes: Routes = [
   {
@@ -31,6 +33,10 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         component: Dashboard
+      },
+      {
+        path: 'change-password',
+        component: ChangePassword
       },
       {
       path: 'students',
@@ -79,6 +85,10 @@ export const routes: Routes = [
       {
         path: 'schoolClasses/edit/:id',
         component: SchoolClassForm
+      },
+      {
+        path: 'schoolClasses/:id',
+        component: ClassDetails
       },
       {
         path: 'assignments',

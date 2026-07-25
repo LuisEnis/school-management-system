@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
-import { User, UserRole } from '../models/user.model';
-import { UserService } from './user.service';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+import { LoginRequest } from '../models/auth/login-request.model';
+import { LoginResponse } from '../models/auth/login-response.model';
+import { UserDetails } from '../models/auth/user-details.model';
 
 @Injectable({
   providedIn: 'root'
@@ -8,84 +11,109 @@ import { UserService } from './user.service';
 export class AuthService {
 
 
-  private currentUser: User | null = null;
+  private apiUrl = 'https://localhost:7233/api/auth';
+  
+  private currentUser: UserDetails | null = null;
 
 
   constructor(
-    private userService: UserService
+      private http: HttpClient
   ){}
 
 
 
   login(
-    username:string,
-    password:string
-  ): User | null {
+      request: LoginRequest
+  ): Observable<LoginResponse> {
+
+      return this.http
+          .post<LoginResponse>(
+              `${this.apiUrl}/login`,
+              request
+          )
+          .pipe(
+              tap(response => {
+
+                  localStorage.setItem(
+                      'token',
+                      response.token
+                  );
+
+                  localStorage.setItem(
+                      'user',
+                      JSON.stringify(response.user)
+                  );
+
+                  this.currentUser =
+                      response.user;
+
+              })
+          );
+  }
 
 
-    const user =
-      this.userService
-        .getUsers()
-        .find(
-          u =>
-          u.username === username &&
-          u.password === password
-        );
+  logout(): void {
 
+      this.currentUser = null;
 
-    if(user){
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
 
-      this.currentUser = user;
+  }
 
-      localStorage.setItem(
-        'user',
-        JSON.stringify(user)
+  getToken(): string | null {
+
+      return localStorage.getItem('token');
+
+  }
+
+  getMe(): Observable<UserDetails> {
+
+    return this.http.get<UserDetails>(
+      `${this.apiUrl}/me`
+    );
+
+  }
+
+  loadCurrentUser(): Observable<UserDetails> {
+
+    return this.getMe()
+      .pipe(
+        tap(user => {
+
+          this.currentUser = user;
+
+          localStorage.setItem(
+            'user',
+            JSON.stringify(user)
+          );
+
+        })
       );
 
-      return user;
-
-    }
-
-
-    return null;
   }
 
+  getCurrentUser(): UserDetails | null {
+
+      if(this.currentUser)
+          return this.currentUser;
 
 
-  logout():void {
-
-    this.currentUser = null;
-
-    localStorage.removeItem('user');
-
-  }
+      const stored =
+          localStorage.getItem('user');
 
 
+      if(stored){
 
-  getCurrentUser():User|null {
+          this.currentUser =
+              JSON.parse(stored);
 
+          return this.currentUser;
 
-    if(this.currentUser)
-      return this.currentUser;
-
-
-
-    const stored =
-      localStorage.getItem('user');
+      }
 
 
-    if(stored){
-
-      this.currentUser =
-        JSON.parse(stored);
-
-      return this.currentUser;
-
-    }
-
-
-    return null;
-
+      return null;
   }
 
 

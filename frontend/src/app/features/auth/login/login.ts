@@ -13,7 +13,7 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class Login {
 
-  username = '';
+  email = '';
   password = '';
   errorMessage = '';
 
@@ -23,7 +23,18 @@ export class Login {
   ) {}
 
   onLogin(): void {
-    const user = this.authService.login(this.username, this.password);
+    const user = this.authService.login({
+        email: this.email,
+        password: this.password
+    })
+    .subscribe({
+        next: response => {
+            this.router.navigate(['/']);
+        },
+        error: () => {
+            this.errorMessage = 'Invalid email or password';
+        }
+    });
 
     if (user) {
       this.router.navigate(['/']);
