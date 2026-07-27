@@ -19,6 +19,48 @@ namespace SchoolManagement.API.Controllers
         }
 
         /// <summary>
+        /// Gets all student class assignments.
+        /// </summary>
+        [HttpGet("student-class")]
+        public async Task<ActionResult<IEnumerable<StudentClassAssignmentDto>>>
+            GetStudentClassAssignments()
+        {
+            var result =
+                await _assignmentService
+                    .GetStudentClassAssignmentsAsync();
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Gets all teacher subject assignments.
+        /// </summary>
+        [HttpGet("teacher-subject")]
+        public async Task<ActionResult<IEnumerable<TeacherSubjectAssignmentDto>>>
+            GetTeacherSubjectAssignments()
+        {
+            var result =
+                await _assignmentService
+                    .GetTeacherSubjectAssignmentsAsync();
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Gets all teaching assignments.
+        /// </summary>
+        [HttpGet("teaching-assignment")]
+        public async Task<ActionResult<IEnumerable<TeachingAssignmentDto>>>
+            GetTeachingAssignments()
+        {
+            var result =
+                await _assignmentService
+                    .GetTeachingAssignmentsAsync();
+
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Assigns a student to a class using their ids.
         /// </summary>
         [HttpPost("student-class")]

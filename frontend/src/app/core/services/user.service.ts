@@ -1,122 +1,112 @@
-import { Injectable } from "@angular/core";
-import { User, UserRole } from "../models/user.model";
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+import { environment } from '../../../environments/environment';
+
+import { UserDto } from '../models/users/user.dto';
+import { UserDetails } from '../models/users/user-details.dto';
+import { CreateUserDto } from '../models/users/create-user.dto';
+import { UpdateUserDto } from '../models/users/update-user.dto';
+import { ChangePasswordDto } from '../models/users/change-password.dto';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn:'root'
 })
 export class UserService {
 
-  private users: User[] = [
 
-    {
-      id: 1,
-      username: 'john',
-      password: '123',
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john@test.com',
-      role: UserRole.Student
-    },
-
-    {
-      id: 2,
-      username: 'anna',
-      password: '123',
-      firstName: 'Anna',
-      lastName: 'Smith',
-      email: 'anna@test.com',
-      role: UserRole.Student
-    },
-
-    {
-      id: 3,
-      username: 'luis',
-      password: '123',
-      firstName: 'Luis',
-      lastName: 'Teacher',
-      email: 'luis@teacher.com',
-      role: UserRole.Teacher
-    },
-
-    {
-      id: 4,
-      username: 'brandon',
-      password: '123',
-      firstName: 'Brandon',
-      lastName: 'Teacher',
-      email: 'brandon@teacher.com',
-      role: UserRole.Teacher
-    }
-
-  ];
+private apiUrl =
+`${environment.apiUrl}/users`;
 
 
-  getUsers(): User[] {
-    return this.users;
-  }
+constructor(
+ private http:HttpClient
+){}
+
+getAll(): Observable<UserDto[]> {
+
+  return this.http.get<UserDto[]>(
+    this.apiUrl
+  );
+
+}
 
 
-  getUserById(id:number):User|undefined {
+getStudents():Observable<UserDto[]>{
 
-    return this.users.find(
-      u => u.id === id
-    );
+ return this.http.get<UserDto[]>(
+ `${this.apiUrl}/students`
+ );
 
-  }
-
-
-  getUsersByRole(role: UserRole): User[] {
-
-    return this.users.filter(
-      u => u.role === role
-    );
-
-  }
+}
 
 
-  addUser(user:User):User {
+getTeachers():Observable<UserDto[]>{
 
-    user.id = this.users.length
-      ? Math.max(...this.users.map(u => u.id)) + 1
-      : 1;
+ return this.http.get<UserDto[]>(
+ `${this.apiUrl}/teachers`
+ );
 
-    this.users.push(user);
-
-    return user;
-
-  }
+}
 
 
-  updateUser(
-    id:number,
-    updated:Partial<User>
-  ):void {
+getUserById(
+ id:number
+):Observable<UserDetails>{
 
-    const index =
-      this.users.findIndex(
-        u => u.id === id
-      );
+ return this.http.get<UserDetails>(
+ `${this.apiUrl}/${id}`
+ );
 
-
-    if(index !== -1){
-
-      this.users[index] = {
-        ...this.users[index],
-        ...updated
-      };
-
-    }
-
-  }
+}
 
 
-  deleteUser(id:number):void {
+create(
+ dto:CreateUserDto
+):Observable<UserDto>{
 
-    this.users =
-      this.users.filter(
-        u => u.id !== id
-      );
+ return this.http.post<UserDto>(
+ this.apiUrl,
+ dto
+ );
 
-  }
+}
+
+
+update(
+ id:number,
+ dto:UpdateUserDto
+):Observable<void>{
+
+ return this.http.put<void>(
+ `${this.apiUrl}/${id}`,
+ dto
+ );
+
+}
+
+
+delete(
+ id:number
+):Observable<void>{
+
+ return this.http.delete<void>(
+ `${this.apiUrl}/${id}`
+ );
+
+}
+
+
+changePassword(
+  dto: ChangePasswordDto
+): Observable<void> {
+
+  return this.http.put<void>(
+    `${this.apiUrl}/change-password`,
+    dto
+  );
+
+}
 
 }

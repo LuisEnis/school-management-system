@@ -1,40 +1,100 @@
-import { Injectable } from "@angular/core";
-import { SchoolClass } from "../models/school-class.model";
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+import { environment } from '../../../environments/environment';
+
+import { SchoolClass } from '../models/schoolClasses/school-class.model';
+import { CreateSchoolClassDto } from '../models/schoolClasses/create-school-class.dto';
+import { UpdateSchoolClassDto } from '../models/schoolClasses/update-school-class.dto';
+import { ClassDetailsDto } from '../models/schoolClasses/class-details.dto';
+
+
+@Injectable({
+  providedIn:'root'
+})
 export class SchoolClassService {
 
-  private classes: SchoolClass[] = [
-    { id: 1, name: '6A' },
-    { id: 2, name: '6B' }
-  ];
 
-  getClasses(): SchoolClass[] {
-    return this.classes;
-  }
+private apiUrl =
+`${environment.apiUrl}/schoolclasses`;
 
-  getById(id: number): SchoolClass | undefined {
-    return this.classes.find(c => c.id === id);
-  }
 
-  add(cls: SchoolClass): SchoolClass {
-    cls.id = this.classes.length
-      ? Math.max(...this.classes.map(c => c.id)) + 1
-      : 1;
+constructor(
+ private http:HttpClient
+){}
 
-    this.classes.push(cls);
-    return cls;
-  }
 
-  update(id: number, updated: Partial<SchoolClass>) {
-    const index = this.classes.findIndex(c => c.id === id);
 
-    if (index !== -1) {
-      this.classes[index] = { ...this.classes[index], ...updated };
-    }
-  }
+getClasses():Observable<SchoolClass[]>{
 
-  delete(id: number) {
-    this.classes = this.classes.filter(c => c.id !== id);
-  }
+ return this.http.get<SchoolClass[]>(
+  this.apiUrl
+ );
+
+}
+
+
+
+getById(
+ id:number
+):Observable<SchoolClass>{
+
+ return this.http.get<SchoolClass>(
+ `${this.apiUrl}/${id}`
+ );
+
+}
+
+
+
+getDetails(
+ id:number
+):Observable<ClassDetailsDto>{
+
+ return this.http.get<ClassDetailsDto>(
+ `${this.apiUrl}/${id}/details`
+ );
+
+}
+
+
+
+create(
+ dto:CreateSchoolClassDto
+):Observable<SchoolClass>{
+
+ return this.http.post<SchoolClass>(
+ this.apiUrl,
+ dto
+ );
+
+}
+
+
+
+update(
+ id:number,
+ dto:UpdateSchoolClassDto
+):Observable<void>{
+
+ return this.http.put<void>(
+ `${this.apiUrl}/${id}`,
+ dto
+ );
+
+}
+
+
+
+delete(
+ id:number
+):Observable<void>{
+
+ return this.http.delete<void>(
+ `${this.apiUrl}/${id}`
+ );
+
+}
+
 }

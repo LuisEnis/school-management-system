@@ -4,6 +4,12 @@ namespace SchoolManagement.API.Interfaces.Services
 {
     public interface IAssignmentService
     {
+        Task<IEnumerable<StudentClassAssignmentDto>> GetStudentClassAssignmentsAsync();
+
+        Task<IEnumerable<TeacherSubjectAssignmentDto>> GetTeacherSubjectAssignmentsAsync();
+
+        Task<IEnumerable<TeachingAssignmentDto>> GetTeachingAssignmentsAsync();
+
         Task<StudentClassAssignmentDto> AssignStudentToClassAsync(CreateStudentClassAssignmentDto dto);
 
         Task<TeacherSubjectAssignmentDto> AssignTeacherToSubjectAsync(CreateTeacherSubjectAssignmentDto dto);

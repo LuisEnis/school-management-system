@@ -48,6 +48,12 @@ namespace SchoolManagement.API.Interfaces.Repositories
 
         Task<bool> ClassHasTeachingAssignmentsAsync(int classId);
 
+        Task<IEnumerable<StudentClass>> GetStudentClassAssignmentsAsync();
+
+        Task<IEnumerable<TeacherSubject>> GetTeacherSubjectAssignmentsAsync();
+
+        Task<IEnumerable<TeachingAssignment>> GetTeachingAssignmentsAsync();
+
         Task SaveChangesAsync();
     }
 }

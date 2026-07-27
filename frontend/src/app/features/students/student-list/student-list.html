@@ -11,20 +11,16 @@
     <tr>
       <th>ID</th>
       <th>Full Name</th>
-      <th>Username</th>
       <th>Email</th>
-      <th>Class</th>
       <th>Actions</th>
     </tr>
   </thead>
 
   <tbody>
-    <tr *ngFor="let student of students">
+    <tr *ngFor="let student of students$ | async">
       <td>{{ student.id }}</td>
-      <td>{{ student.firstName }} {{ student.lastName }}</td>
-      <td>{{ student.username }}</td>
+      <td>{{ student.fullName }}</td>
       <td>{{ student.email }}</td>
-      <td>{{ getClassName(student.id) }}</td>
 
       <td class="actions">
         <button class="edit-btn"

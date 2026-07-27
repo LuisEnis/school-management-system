@@ -4,8 +4,8 @@ import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { UserService } from '../../../core/services/user.service';
-import { User, UserRole } from '../../../core/models/user.model';
-import { SchoolClass } from '../../../core/models/school-class.model';
+import {UserRole } from '../../../core/models/user.model';
+import { SchoolClass } from '../../../core/models/schoolClasses/school-class.model';
 import { SchoolClassService } from '../../../core/services/schoolClass.service';
 import { AssignmentService } from '../../../core/services/assignment.service';
 
@@ -43,46 +43,215 @@ export class StudentForm implements OnInit {
       classId: [null]
     });
 
-    this.classes = this.schoolClassService.getClasses();
+    this.schoolClassService
+    .getClasses()
+    .subscribe({
+        next: classes => {
+            this.classes = classes;
+        },
+        error: error => {
+            console.error(
+              'Failed loading classes',
+              error
+            );
+        }
+    });
 
     this.studentId = Number(this.route.snapshot.paramMap.get('id'));
 
     if (this.studentId) {
-      this.isEditMode = true;
-      const student = this.userService.getUserById(this.studentId);
 
-      if (student) {
+    this.isEditMode = true;
 
-        const studentClass = this.assignmentService.getStudentClass(student.id);
+    this.userService
+      .getUserById(this.studentId)
+      .subscribe({
 
-        this.form.patchValue({
-          ...student,
-          classId: studentClass ? studentClass.id : null
-        });
-      }
-    }
+        next: student => {
+
+          this.form.patchValue({
+            username: student.username,
+            firstName: student.firstName,
+            lastName: student.lastName,
+            email: student.email
+          });
+
+        },
+
+        error: error => {
+
+          console.error(
+            'Failed loading student',
+            error
+          );
+
+        }
+
+      });
+
+  }
   }
 
   save(): void {
 
-    const { classId, ...studentData } = this.form.value;
 
-    if (this.isEditMode) {
+    const {
+      classId,
+      ...studentData
+    } = this.form.value;
 
-      this.userService.updateUser(this.studentId!, studentData);
 
-      this.assignmentService.assignStudentToClass(this.studentId!, classId);
 
-    } else {
+    if(this.isEditMode){
 
-      const newStudent = this.userService.addUser({
-        role: UserRole.Student,
-        ...studentData
-      });
 
-      this.assignmentService.assignStudentToClass(newStudent.id, classId);
+      this.userService
+        .update(
+          this.studentId!,
+          {
+            ...studentData,
+            role: UserRole.Student
+          }
+        )
+        .subscribe({
+
+          next: () => {
+
+            this.updateClassAssignment();
+
+          },
+
+          error: error => {
+
+            console.error(
+              'Failed updating student',
+              error
+            );
+
+          }
+
+        });
+
+
+    }
+    else {
+
+
+      this.userService
+        .create({
+
+          ...studentData,
+
+          role: UserRole.Student
+
+        })
+        .subscribe({
+
+          next: student => {
+
+
+            this.assignClass(student.id, classId);
+
+
+          },
+
+          error: error => {
+
+            console.error(
+              'Failed creating student',
+              error
+            );
+
+          }
+
+        });
+
+
     }
 
-    this.router.navigate(['/students']);
   }
+
+  private assignClass(
+    studentId:number,
+    classId:number | null
+  ):void {
+
+
+    if(!classId){
+
+      this.router.navigate(['/students']);
+
+      return;
+
+    }
+
+
+    this.assignmentService
+      .assignStudentToClass({
+
+        studentId,
+
+        schoolClassId: classId
+
+      })
+      .subscribe({
+
+        next: () => {
+
+          this.router.navigate(['/students']);
+
+        },
+
+        error: error => {
+
+          console.error(
+            'Failed assigning class',
+            error
+          );
+
+        }
+
+      });
+
+  }
+
+  private updateClassAssignment():void {
+
+
+    // For now we simply assign the new class.
+    // Later we can load the old assignment and delete it first.
+
+    const classId =
+      this.form.value.classId;
+
+
+    if(classId){
+
+      this.assignmentService
+        .assignStudentToClass({
+
+          studentId:this.studentId!,
+
+          schoolClassId:classId
+
+        })
+        .subscribe({
+
+          next:()=>{
+
+            this.router.navigate(['/students']);
+
+          }
+
+        });
+
+    }
+    else {
+
+      this.router.navigate(['/students']);
+
+    }
+
+  }
+
 }

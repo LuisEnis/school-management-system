@@ -14,6 +14,11 @@ import { SchoolClassForm } from './features/schoolClasses/school-class-form/scho
 import { TeacherSubjectAssignment } from './features/assignments/teacher-subject-assignment/teacher-subject-assignment';
 import { ClassDetails } from './features/schoolClasses/class-details/class-details';
 import { ChangePassword } from './features/auth/change-password/change-password';
+import { StudentClassAssignmentForm } from './features/assignments/student-class-assignment-form/student-class-assignment-form';
+import { TeacherSubjectAssignmentForm } from './features/assignments/teacher-subject-assignment-form/teacher-subject-assignment-form';
+import { TeachingAssignmentForm } from './features/assignments/teaching-assignment-form/teaching-assignment-form';
+import { StudentClassAssignment } from './features/assignments/student-class-assignment/student-class-assignment';
+import { TeachingAssignment } from './features/assignments/teaching-assignment/teaching-assignment';
 
 export const routes: Routes = [
   {
@@ -87,12 +92,32 @@ export const routes: Routes = [
         component: SchoolClassForm
       },
       {
-        path: 'schoolClasses/:id',
-        component: ClassDetails
+        path: 'assignments/student-class',
+        component: StudentClassAssignment
       },
       {
-        path: 'assignments',
+        path: 'assignments/teacher-subject',
         component: TeacherSubjectAssignment
+      },
+      {
+        path: 'assignments/teaching-assignment',
+        component: TeachingAssignment
+      },
+      {
+        path: 'assignments/student-class/new',
+        component: StudentClassAssignmentForm
+      },
+      {
+        path: 'assignments/teacher-subject/new',
+        component: TeacherSubjectAssignmentForm
+      },
+      {
+        path: 'assignments/teaching/new',
+        component: TeachingAssignmentForm
+      },
+      {
+        path:'schoolClasses/details/:id',
+        component:ClassDetails
       }
     ]
   }

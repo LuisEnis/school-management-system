@@ -1,0 +1,96 @@
+<div class="page-header">
+
+<h1>
+Teaching Assignments
+</h1>
+
+
+<button
+class="add-btn"
+routerLink="/assignments/teaching-assignment/new">
+
++ Add New
+
+</button>
+
+
+</div>
+
+
+
+<table class="table">
+
+<thead>
+
+<tr>
+
+<th>Teacher</th>
+<th>Subject</th>
+<th>Class</th>
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+
+<ng-container *ngIf="assignments$ | async as assignments">
+    <tbody>
+
+
+    <tr *ngFor="let assignment of assignments">
+
+
+    <td>
+    {{ assignment.teacherName }}
+    </td>
+
+
+    <td>
+    {{ assignment.subjectName }}
+    </td>
+
+
+    <td>
+    {{ assignment.schoolClassName }}
+    </td>
+
+
+    <td class="actions">
+
+
+    <button
+    class="delete-btn"
+    (click)="delete(
+    assignment.schoolClassId,
+    assignment.subjectId,
+    assignment.teacherId
+    )">
+
+    Delete
+
+    </button>
+
+
+    </td>
+
+
+    </tr>
+
+
+
+    <tr *ngIf="assignments.length === 0">
+
+    <td colspan="4" class="empty">
+
+    No assignments found.
+
+    </td>
+
+    </tr>
+
+
+    </tbody>
+</ng-container>
+
+</table>

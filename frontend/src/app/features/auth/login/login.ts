@@ -23,23 +23,39 @@ export class Login {
   ) {}
 
   onLogin(): void {
-    const user = this.authService.login({
-        email: this.email,
-        password: this.password
-    })
-    .subscribe({
-        next: response => {
-            this.router.navigate(['/']);
-        },
-        error: () => {
-            this.errorMessage = 'Invalid email or password';
-        }
-    });
 
-    if (user) {
-      this.router.navigate(['/']);
-    } else {
-      this.errorMessage = 'Invalid username or password';
-    }
+      this.authService
+          .login({
+              email: this.email,
+              password: this.password
+          })
+          .subscribe({
+              next: () => {
+
+                  this.authService
+                      .loadCurrentUser()
+                      .subscribe({
+                          next: () => {
+
+                              this.router.navigate(['/']);
+
+                          },
+                          error: () => {
+
+                              this.errorMessage =
+                                  'Could not load user information.';
+
+                          }
+                      });
+
+              },
+              error: () => {
+
+                  this.errorMessage =
+                      'Invalid email or password';
+
+              }
+          });
+
   }
 }

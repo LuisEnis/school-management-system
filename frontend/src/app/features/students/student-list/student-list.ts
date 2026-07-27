@@ -1,63 +1,70 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 import { UserService } from '../../../core/services/user.service';
-import { User, UserRole } from '../../../core/models/user.model';
-import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { AssignmentService } from '../../../core/services/assignment.service';
-import { SchoolClassService } from '../../../core/services/schoolClass.service';
+import { UserDto } from '../../../core/models/users/user.dto';
+import { Observable } from 'rxjs';
+
 
 @Component({
   selector: 'app-student-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [
+    CommonModule,
+    RouterLink
+  ],
   templateUrl: './student-list.html',
   styleUrl: './student-list.css'
 })
 export class StudentList implements OnInit {
 
-  students: User[] = [];
 
-  showForm = false;
+  students$!: Observable<UserDto[]>;
 
-  newStudent = {
-    firstName: '',
-    lastName: '',
-    username: '',
-    email: '',
-    password: ''
-  };
 
   constructor(
-    private userService: UserService,
-    private assignmentService: AssignmentService,
-    private schoolClassService: SchoolClassService
+    private userService: UserService
   ) {}
 
+
   ngOnInit(): void {
-    this.students = this.userService.getUsersByRole(UserRole.Student);
+
+      this.students$ =
+          this.userService.getStudents();
+
   }
 
-  getClassName(studentId: number): string {
 
-    const studentClass =
-      this.assignmentService.getStudentClass(studentId);
+  delete(id:number): void {
 
-    if (!studentClass) {
-      return 'Not Assigned';
-    }
+    if(!confirm('Are you sure you want to delete this student?'))
+      return;
 
 
-    const schoolClass =
-      this.schoolClassService.getById(studentClass.classId);
+    this.userService
+      .delete(id)
+      .subscribe({
+
+        next: () => {
+
+          this.students$ =
+                  this.userService.getStudents();
 
 
-    return schoolClass?.name || 'Not Assigned';
+        },
+
+        error: error => {
+
+          console.error(
+            'Failed deleting student',
+            error
+          );
+
+        }
+
+      });
+
   }
 
-  delete(id: number) {
-    this.userService.deleteUser(id);
-    this.students = this.userService.getUsersByRole(UserRole.Student);
-  }
 }

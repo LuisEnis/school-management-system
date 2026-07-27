@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { LoginRequest } from '../models/auth/login-request.model';
-import { LoginResponse } from '../models/auth/login-response.model';
-import { UserDetails } from '../models/auth/user-details.model';
+import { LoginRequest } from '../models/auth/login-request.dto';
+import { LoginResponse } from '../models/auth/login-response.dto';
+import { UserDetails } from '../models/users/user-details.dto';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ import { UserDetails } from '../models/auth/user-details.model';
 export class AuthService {
 
 
-  private apiUrl = 'https://localhost:7233/api/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
   
   private currentUser: UserDetails | null = null;
 
@@ -38,15 +39,6 @@ export class AuthService {
                       'token',
                       response.token
                   );
-
-                  localStorage.setItem(
-                      'user',
-                      JSON.stringify(response.user)
-                  );
-
-                  this.currentUser =
-                      response.user;
-
               })
           );
   }
@@ -70,10 +62,10 @@ export class AuthService {
   getMe(): Observable<UserDetails> {
 
     return this.http.get<UserDetails>(
-      `${this.apiUrl}/me`
+        `${this.apiUrl}/me`
     );
 
-  }
+    }
 
   loadCurrentUser(): Observable<UserDetails> {
 

@@ -16,7 +16,7 @@
   </thead>
 
   <tbody>
-    <tr *ngFor="let schoolClass of schoolClasses">
+    <tr *ngFor="let schoolClass of schoolClasses$ | async">
       <td>{{ schoolClass.id }}</td>
       <td>{{ schoolClass.name }}</td>
 
@@ -29,6 +29,12 @@
         <button class="delete-btn"
                 (click)="delete(schoolClass.id)">
           Delete
+        </button>
+
+        <button
+          class="edit-btn"
+          [routerLink]="['/schoolClasses/details', schoolClass.id]">
+          Details
         </button>
       </td>
     </tr>

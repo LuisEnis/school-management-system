@@ -9,7 +9,9 @@
       <a routerLink="/teachers" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Teachers</a>
       <a routerLink="/schoolClasses" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Classes</a>
       <a routerLink="/subjects" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Subjects</a>
-      <a routerLink="/assignments" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Subjects Assignments</a>
+      <a routerLink="/assignments/student-class" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Student-Class Assignments</a>
+      <a routerLink="/assignments/teacher-subject" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Teacher-Subject Assignments</a>
+      <a routerLink="/assignments/teaching-assignment" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Teaching Assignments</a>
     </nav>
 
     <button class="logout-btn" (click)="logout()">

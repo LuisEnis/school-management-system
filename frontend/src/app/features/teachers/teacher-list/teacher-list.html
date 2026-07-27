@@ -12,18 +12,16 @@
     <tr>
       <th>ID</th>
       <th>Full Name</th>
-      <th>Username</th>
       <th>Email</th>
       <th>Actions</th>
     </tr>
   </thead>
 
   <tbody>
-    <tr *ngFor="let teacher of teachers">
+    <tr *ngFor="let teacher of teachers$ | async">
 
       <td>{{ teacher.id }}</td>
       <td>{{ teacher.firstName }} {{ teacher.lastName }}</td>
-      <td>{{ teacher.username }}</td>
       <td>{{ teacher.email }}</td>
 
       <td class="actions">

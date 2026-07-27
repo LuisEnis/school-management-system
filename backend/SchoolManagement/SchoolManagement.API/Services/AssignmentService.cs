@@ -284,5 +284,74 @@ namespace SchoolManagement.API.Services
 
             return true;
         }
+
+        public async Task<IEnumerable<StudentClassAssignmentDto>> GetStudentClassAssignmentsAsync()
+        {
+            var assignments =
+                await _assignmentRepository
+                    .GetStudentClassAssignmentsAsync();
+
+
+            return assignments.Select(x => new StudentClassAssignmentDto
+            {
+                StudentId = x.StudentId,
+
+                StudentName =
+                    $"{x.Student.FirstName} {x.Student.LastName}",
+
+                SchoolClassId = x.SchoolClassId,
+
+                SchoolClassName =
+                    x.SchoolClass.Name
+            });
+        }
+
+        public async Task<IEnumerable<TeacherSubjectAssignmentDto>> GetTeacherSubjectAssignmentsAsync()
+        {
+            var assignments =
+                await _assignmentRepository
+                    .GetTeacherSubjectAssignmentsAsync();
+
+
+            return assignments.Select(x => new TeacherSubjectAssignmentDto
+            {
+                TeacherId = x.TeacherId,
+
+                TeacherName =
+                    $"{x.Teacher.FirstName} {x.Teacher.LastName}",
+
+                SubjectId = x.SubjectId,
+
+                SubjectName =
+                    x.Subject.Name
+            });
+        }
+
+        public async Task<IEnumerable<TeachingAssignmentDto>> GetTeachingAssignmentsAsync()
+        {
+            var assignments =
+                await _assignmentRepository
+                    .GetTeachingAssignmentsAsync();
+
+
+            return assignments.Select(x => new TeachingAssignmentDto
+            {
+                TeacherId = x.TeacherId,
+
+                TeacherName =
+                    $"{x.Teacher.FirstName} {x.Teacher.LastName}",
+
+                SubjectId = x.SubjectId,
+
+                SubjectName =
+                    x.Subject.Name,
+
+                SchoolClassId =
+                    x.SchoolClassId,
+
+                SchoolClassName =
+                    x.SchoolClass.Name
+            });
+        }
     }
 }

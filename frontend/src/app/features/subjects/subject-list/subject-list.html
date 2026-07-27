@@ -16,7 +16,7 @@
   </thead>
 
   <tbody>
-    <tr *ngFor="let subject of subjects">
+    <tr *ngFor="let subject of subjects$ | async">
       <td>{{ subject.id }}</td>
       <td>{{ subject.name }}</td>
 

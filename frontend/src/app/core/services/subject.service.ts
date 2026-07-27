@@ -1,45 +1,78 @@
 import { Injectable } from '@angular/core';
-import { Subject } from '../models/subject.model';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+import { environment } from '../../../environments/environment';
+import { Subject } from '../models/subjects/subject.model';
+import { CreateSubjectDto } from '../models/subjects/create-subject.dto';
+import { UpdateSubjectDto } from '../models/subjects/update-subject.dto';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class SubjectService {
 
-  private subjects: Subject[] = [
-    { id: 1, name: 'Mathematics' },
-    { id: 2, name: 'Physics' }
-  ];
 
-  getSubjects(): Subject[] {
-    return this.subjects;
+  private apiUrl = `${environment.apiUrl}/subjects`;
+
+
+  constructor(
+    private http: HttpClient
+  ) {}
+
+
+  getAll(): Observable<Subject[]> {
+
+    return this.http.get<Subject[]>(
+      this.apiUrl
+    );
+
   }
 
-  getSubjectById(id: number): Subject | undefined {
-    return this.subjects.find(s => s.id === id);
+
+  getById(id:number): Observable<Subject> {
+
+    return this.http.get<Subject>(
+      `${this.apiUrl}/${id}`
+    );
+
   }
 
-  addSubject(subject: Subject): Subject {
-    subject.id = this.subjects.length
-      ? Math.max(...this.subjects.map(s => s.id)) + 1
-      : 1;
 
-    this.subjects.push(subject);
-    return subject;
+  create(
+    dto: CreateSubjectDto
+  ): Observable<Subject> {
+
+    return this.http.post<Subject>(
+      this.apiUrl,
+      dto
+    );
+
   }
 
-  updateSubject(id: number, updated: Partial<Subject>): void {
-    const index = this.subjects.findIndex(s => s.id === id);
 
-    if (index !== -1) {
-      this.subjects[index] = {
-        ...this.subjects[index],
-        ...updated
-      };
-    }
+  update(
+    id:number,
+    dto: UpdateSubjectDto
+  ): Observable<void> {
+
+    return this.http.put<void>(
+      `${this.apiUrl}/${id}`,
+      dto
+    );
+
   }
 
-  deleteSubject(id: number): void {
-    this.subjects = this.subjects.filter(s => s.id !== id);
+
+  delete(
+    id:number
+  ): Observable<void> {
+
+    return this.http.delete<void>(
+      `${this.apiUrl}/${id}`
+    );
+
   }
+
 }

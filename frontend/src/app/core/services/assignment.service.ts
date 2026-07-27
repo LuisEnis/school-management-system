@@ -1,265 +1,161 @@
-import { Injectable } from "@angular/core";
-import { StudentClass } from "../models/student-class.model";
-import { SchoolClass } from "../models/school-class.model";
-import { TeacherSubject } from "../models/teacher-subject.model";
-import { Subject } from "../models/subject.model";
-import { TeachingAssignment } from "../models/teaching-assignment.model";
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+import { environment } from '../../../environments/environment';
+
+import { CreateStudentClassAssignmentDto } 
+from '../models/assignments/create-student-class-assignment.dto';
+
+import { CreateTeacherSubjectAssignmentDto }
+from '../models/assignments/create-teacher-subject-assignment.dto';
+
+import { CreateTeachingAssignmentDto }
+from '../models/assignments/create-teaching-assignment.dto';
+import { StudentClass } from '../models/assignments/student-class.model';
+import { TeacherSubject } from '../models/assignments/teacher-subject.model';
+import { TeachingAssignment } from '../models/assignments/teaching-assignment.model';
+import { TeachingAssignmentDto } from '../models/assignments/teaching-assignment.dto';
+import { TeacherSubjectAssignmentDto } from '../models/assignments/teacher-subject-assignment.dto';
+import { StudentClassAssignmentDto } from '../models/assignments/student-class-assignment.dto';
+
 
 @Injectable({
-  providedIn: 'root'
+  providedIn:'root'
 })
-
 export class AssignmentService {
-private studentClasses: StudentClass[] = [
-    {
-      id: 1,
-      studentId: 1,
-      classId: 1
-    },
-    {
-      id: 2,
-      studentId: 2,
-      classId: 2
-    }
-  ];
 
 
-  private teacherSubjects: TeacherSubject[] = [
-    {
-      id: 1,
-      teacherId: 3,
-      subjectId: 1
-    },
-    {
-      id: 2,
-      teacherId: 4,
-      subjectId: 2
-    }
-  ];
+  private apiUrl =
+  `${environment.apiUrl}/assignments`;
 
 
-  private teachingAssignments: TeachingAssignment[] = [
-    {
-      id: 1,
-      schoolClassId: 1,
-      subjectId: 1,
-      teacherId: 3
-    },
-    {
-      id: 2,
-      schoolClassId: 1,
-      subjectId: 2,
-      teacherId: 3
-    },
-    {
-      id: 3,
-      schoolClassId: 2,
-      subjectId: 1,
-      teacherId: 4
-    }
-  ];
+  constructor(
+    private http:HttpClient
+  ){}
 
 
-  // ============================
-  // Student - Class
-  // ============================
+  getStudentClassAssignments(): Observable<StudentClassAssignmentDto[]> {
 
-  getStudentClasses(): StudentClass[] {
-    return this.studentClasses;
+    return this.http.get<StudentClassAssignmentDto[]>(
+      `${this.apiUrl}/student-class`
+    );
+
   }
 
 
-  getStudentClass(studentId: number): StudentClass | undefined {
 
-    return this.studentClasses.find(
-      sc => sc.studentId === studentId
+  getTeacherSubjectAssignments(): Observable<TeacherSubjectAssignmentDto[]> {
+
+    return this.http.get<TeacherSubjectAssignmentDto[]>(
+      `${this.apiUrl}/teacher-subject`
+    );
+
+  }
+
+
+
+  getTeachingAssignments(): Observable<TeachingAssignmentDto[]> {
+
+    return this.http.get<TeachingAssignmentDto[]>(
+      `${this.apiUrl}/teaching-assignment`
     );
 
   }
 
 
   assignStudentToClass(
-    studentId: number,
-    classId: number | null
-  ): void {
+    dto:CreateStudentClassAssignmentDto
+  ):Observable<Observable<StudentClass>>{
 
-
-    this.studentClasses =
-      this.studentClasses.filter(
-        sc => sc.studentId !== studentId
-      );
-
-
-    if (classId) {
-
-      const newId = this.studentClasses.length
-        ? Math.max(...this.studentClasses.map(sc => sc.id)) + 1
-        : 1;
-
-
-      this.studentClasses.push({
-        id: newId,
-        studentId,
-        classId
-      });
-
-    }
-  }
-
-
-
-  // ============================
-  // Teacher - Subject
-  // ============================
-
-  getTeacherSubjects(): TeacherSubject[] {
-
-    return this.teacherSubjects;
+    return this.http.post<Observable<StudentClass>>(
+      `${this.apiUrl}/student-class`,
+      dto
+    );
 
   }
+
+
+
+  removeStudentFromClass(
+    studentId:number,
+    schoolClassId:number
+  ):Observable<void>{
+
+    return this.http.delete<void>(
+      `${this.apiUrl}/student-class`,
+      {
+        params:{
+          studentId,
+          schoolClassId
+        }
+      }
+    );
+
+  }
+
 
 
   assignTeacherToSubject(
-    teacherId: number,
-    subjectId: number
-  ): void {
+    dto:CreateTeacherSubjectAssignmentDto
+  ):Observable<TeacherSubject>{
 
-
-    const exists = this.teacherSubjects.some(
-      ts =>
-        ts.teacherId === teacherId &&
-        ts.subjectId === subjectId
-    );
-
-
-    if (!exists) {
-
-      const newId = this.teacherSubjects.length
-        ? Math.max(...this.teacherSubjects.map(ts => ts.id)) + 1
-        : 1;
-
-
-      this.teacherSubjects.push({
-        id: newId,
-        teacherId,
-        subjectId
-      });
-
-    }
-
-  }
-
-
-  deleteTeacherSubject(
-    teacherId: number,
-    subjectId: number
-  ): void {
-
-
-    this.teacherSubjects =
-      this.teacherSubjects.filter(
-        ts =>
-          !(
-            ts.teacherId === teacherId &&
-            ts.subjectId === subjectId
-          )
-      );
-
-  }
-
-
-
-  // ============================
-  // Teaching Assignment
-  // ============================
-
-  getTeachingAssignments(): TeachingAssignment[] {
-
-    return this.teachingAssignments;
-
-  }
-
-
-  addTeachingAssignment(
-    schoolClassId: number,
-    subjectId: number,
-    teacherId: number
-  ): void {
-
-
-    const exists =
-      this.teachingAssignments.some(
-        ta =>
-          ta.schoolClassId === schoolClassId &&
-          ta.subjectId === subjectId &&
-          ta.teacherId === teacherId
-      );
-
-
-    if (!exists) {
-
-      const newId = this.teachingAssignments.length
-        ? Math.max(...this.teachingAssignments.map(ta => ta.id)) + 1
-        : 1;
-
-
-      this.teachingAssignments.push({
-        id: newId,
-        schoolClassId,
-        subjectId,
-        teacherId
-      });
-
-    }
-
-  }
-
-
-
-  deleteTeachingAssignment(id: number): void {
-
-    this.teachingAssignments =
-      this.teachingAssignments.filter(
-        ta => ta.id !== id
-      );
-
-  }
-
-
-
-  getAssignmentsForTeacher(
-    teacherId: number
-  ): TeachingAssignment[] {
-
-
-    return this.teachingAssignments.filter(
-      ta => ta.teacherId === teacherId
+    return this.http.post<TeacherSubject>(
+      `${this.apiUrl}/teacher-subject`,
+      dto
     );
 
   }
 
 
 
-  getAssignmentsForClass(
-    schoolClassId: number
-  ): TeachingAssignment[] {
+  removeTeacherFromSubject(
+    teacherId:number,
+    subjectId:number
+  ):Observable<void>{
 
-
-    return this.teachingAssignments.filter(
-      ta => ta.schoolClassId === schoolClassId
+    return this.http.delete<void>(
+      `${this.apiUrl}/teacher-subject`,
+      {
+        params:{
+          teacherId,
+          subjectId
+        }
+      }
     );
 
   }
 
 
 
-  getAssignmentsForStudentClass(
-    schoolClassId: number
-  ): TeachingAssignment[] {
+  assignTeachingAssignment(
+    dto:CreateTeachingAssignmentDto
+  ):Observable<TeachingAssignment>{
+
+    return this.http.post<TeachingAssignment>(
+      `${this.apiUrl}/teaching-assignment`,
+      dto
+    );
+
+  }
 
 
-    return this.teachingAssignments.filter(
-      ta => ta.schoolClassId === schoolClassId
+
+  removeTeachingAssignment(
+    schoolClassId:number,
+    subjectId:number,
+    teacherId:number
+  ):Observable<void>{
+
+    return this.http.delete<void>(
+      `${this.apiUrl}/teaching-assignment`,
+      {
+        params:{
+          schoolClassId,
+          subjectId,
+          teacherId
+        }
+      }
     );
 
   }

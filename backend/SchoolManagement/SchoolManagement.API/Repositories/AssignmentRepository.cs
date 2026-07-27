@@ -168,6 +168,31 @@ namespace SchoolManagement.API.Repositories
                 .AnyAsync(x => x.SchoolClassId == classId);
         }
 
+        public async Task<IEnumerable<StudentClass>> GetStudentClassAssignmentsAsync()
+        {
+            return await _context.StudentClasses
+                .Include(x => x.Student)
+                .Include(x => x.SchoolClass)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<TeacherSubject>> GetTeacherSubjectAssignmentsAsync()
+        {
+            return await _context.TeacherSubjects
+                .Include(x => x.Teacher)
+                .Include(x => x.Subject)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<TeachingAssignment>> GetTeachingAssignmentsAsync()
+        {
+            return await _context.TeachingAssignments
+                .Include(x => x.Teacher)
+                .Include(x => x.Subject)
+                .Include(x => x.SchoolClass)
+                .ToListAsync();
+        }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

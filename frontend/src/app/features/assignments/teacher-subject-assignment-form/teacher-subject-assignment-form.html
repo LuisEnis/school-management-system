@@ -1,0 +1,84 @@
+<div class="form-container">
+
+<h2>
+Assign Subject To Teacher
+</h2>
+
+
+<form
+[formGroup]="form"
+(ngSubmit)="save()"
+class="form">
+
+
+<div class="form-group">
+
+<label>
+Teacher
+</label>
+
+
+<select formControlName="teacherId">
+
+<option [ngValue]="null">
+Select Teacher
+</option>
+
+
+<option
+*ngFor="let teacher of teachers"
+[ngValue]="teacher.id">
+
+{{teacher.fullName}}
+
+</option>
+
+
+</select>
+
+</div>
+
+
+
+<div class="form-group">
+
+<label>
+Subject
+</label>
+
+
+<select formControlName="subjectId">
+
+<option [ngValue]="null">
+Select Subject
+</option>
+
+
+<option
+*ngFor="let subject of subjects"
+[ngValue]="subject.id">
+
+{{subject.name}}
+
+</option>
+
+
+</select>
+
+</div>
+
+
+
+<button
+class="submit-btn"
+type="submit"
+[disabled]="form.invalid">
+
+Save
+
+</button>
+
+
+</form>
+
+</div>
