@@ -1,7 +1,7 @@
 <div class="page-header">
   <h1>Teachers</h1>
 
-  <button class="add-btn" routerLink="/teachers/new">
+  <button  *ngIf="authService.isDirector()" class="add-btn" routerLink="/teachers/new">
     + Add New
   </button>
 </div>
@@ -10,21 +10,19 @@
 
   <thead>
     <tr>
-      <th>ID</th>
       <th>Full Name</th>
       <th>Email</th>
-      <th>Actions</th>
+      <th  *ngIf="authService.isDirector()">Actions</th>
     </tr>
   </thead>
 
   <tbody>
     <tr *ngFor="let teacher of teachers$ | async">
 
-      <td>{{ teacher.id }}</td>
       <td>{{ teacher.firstName }} {{ teacher.lastName }}</td>
       <td>{{ teacher.email }}</td>
 
-      <td class="actions">
+      <td  *ngIf="authService.isDirector()" class="actions">
         <button class="edit-btn" [routerLink]="['/teachers/edit', teacher.id]">Edit</button>
         <button class="delete-btn" (click)="delete(teacher.id)">Delete</button>
       </td>

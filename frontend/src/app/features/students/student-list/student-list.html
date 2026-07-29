@@ -9,7 +9,6 @@
 <table class="table">
   <thead>
     <tr>
-      <th>ID</th>
       <th>Full Name</th>
       <th>Email</th>
       <th>Actions</th>
@@ -18,7 +17,6 @@
 
   <tbody>
     <tr *ngFor="let student of students$ | async">
-      <td>{{ student.id }}</td>
       <td>{{ student.fullName }}</td>
       <td>{{ student.email }}</td>
 

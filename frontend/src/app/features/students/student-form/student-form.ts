@@ -5,9 +5,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { UserService } from '../../../core/services/user.service';
 import {UserRole } from '../../../core/models/user.model';
-import { SchoolClass } from '../../../core/models/schoolClasses/school-class.model';
-import { SchoolClassService } from '../../../core/services/schoolClass.service';
-import { AssignmentService } from '../../../core/services/assignment.service';
 
 @Component({
   selector: 'app-student-form',
@@ -21,15 +18,12 @@ export class StudentForm implements OnInit {
   form!: FormGroup;
   studentId: number | null = null;
   isEditMode = false;
-  classes : SchoolClass[] = [];
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private userService: UserService,
-    private schoolClassService: SchoolClassService,
-    private assignmentService: AssignmentService
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -39,22 +33,7 @@ export class StudentForm implements OnInit {
       lastName: ['', Validators.required],
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: [''],
-      classId: [null]
-    });
-
-    this.schoolClassService
-    .getClasses()
-    .subscribe({
-        next: classes => {
-            this.classes = classes;
-        },
-        error: error => {
-            console.error(
-              'Failed loading classes',
-              error
-            );
-        }
+      password: ['']
     });
 
     this.studentId = Number(this.route.snapshot.paramMap.get('id'));
@@ -96,7 +75,6 @@ export class StudentForm implements OnInit {
 
 
     const {
-      classId,
       ...studentData
     } = this.form.value;
 
@@ -117,7 +95,7 @@ export class StudentForm implements OnInit {
 
           next: () => {
 
-            this.updateClassAssignment();
+            this.router.navigate(['/students']);
 
           },
 
@@ -150,7 +128,7 @@ export class StudentForm implements OnInit {
           next: student => {
 
 
-            this.assignClass(student.id, classId);
+            this.router.navigate(['/students']);
 
 
           },
@@ -166,89 +144,6 @@ export class StudentForm implements OnInit {
 
         });
 
-
-    }
-
-  }
-
-  private assignClass(
-    studentId:number,
-    classId:number | null
-  ):void {
-
-
-    if(!classId){
-
-      this.router.navigate(['/students']);
-
-      return;
-
-    }
-
-
-    this.assignmentService
-      .assignStudentToClass({
-
-        studentId,
-
-        schoolClassId: classId
-
-      })
-      .subscribe({
-
-        next: () => {
-
-          this.router.navigate(['/students']);
-
-        },
-
-        error: error => {
-
-          console.error(
-            'Failed assigning class',
-            error
-          );
-
-        }
-
-      });
-
-  }
-
-  private updateClassAssignment():void {
-
-
-    // For now we simply assign the new class.
-    // Later we can load the old assignment and delete it first.
-
-    const classId =
-      this.form.value.classId;
-
-
-    if(classId){
-
-      this.assignmentService
-        .assignStudentToClass({
-
-          studentId:this.studentId!,
-
-          schoolClassId:classId
-
-        })
-        .subscribe({
-
-          next:()=>{
-
-            this.router.navigate(['/students']);
-
-          }
-
-        });
-
-    }
-    else {
-
-      this.router.navigate(['/students']);
 
     }
 

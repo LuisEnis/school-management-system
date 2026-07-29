@@ -139,6 +139,19 @@ td {
   padding: 20px;
 }
 
+/* add button */
+.add-btn {
+  background-color: #1e40af;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.add-btn:hover {
+  background-color: #1d4ed8;
+}
 
 
 /* Responsive adjustment */

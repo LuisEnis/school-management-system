@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 
 import { UserService } from '../../../core/services/user.service';
 import { UserDto } from '../../../core/models/users/user.dto';
-import { Observable } from 'rxjs';
+import { Observable, startWith, Subject, switchMap } from 'rxjs';
 
 
 @Component({
@@ -19,7 +19,7 @@ import { Observable } from 'rxjs';
 })
 export class StudentList implements OnInit {
 
-
+  private reload$ = new Subject<void>();
   students$!: Observable<UserDto[]>;
 
 
@@ -31,7 +31,13 @@ export class StudentList implements OnInit {
   ngOnInit(): void {
 
       this.students$ =
-          this.userService.getStudents();
+              this.reload$
+              .pipe(
+                  startWith(null),
+                  switchMap(() =>
+                      this.userService.getStudents()
+                  )
+              );
 
   }
 
@@ -48,8 +54,7 @@ export class StudentList implements OnInit {
 
         next: () => {
 
-          this.students$ =
-                  this.userService.getStudents();
+          this.reload$.next();
 
 
         },
@@ -67,4 +72,8 @@ export class StudentList implements OnInit {
 
   }
 
+}
+
+function startWIth(arg0: null): import("rxjs").OperatorFunction<void, unknown> {
+  throw new Error('Function not implemented.');
 }

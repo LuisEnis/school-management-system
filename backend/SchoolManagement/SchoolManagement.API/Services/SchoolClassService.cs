@@ -100,7 +100,7 @@ namespace SchoolManagement.API.Services
 
             var hasAssignments =
                 await _assignmentRepository
-                    .TeacherHasTeachingAssignmentsAsync(id);
+                    .ClassHasTeachingAssignmentsAsync(id);
 
 
             if (hasStudents || hasAssignments)
@@ -149,6 +149,27 @@ namespace SchoolManagement.API.Services
                     })
                     .ToList()
             };
+        }
+
+        public async Task<ClassDetailsDto?> GetTeacherClassDetailsAsync(int classId, int teacherId)
+        {
+
+            var teacherHasClass =
+                await _assignmentRepository
+                    .TeacherHasClassAsync(
+                        teacherId,
+                        classId);
+
+
+            if (!teacherHasClass)
+            {
+                throw new ForbiddenException(
+                    "You are not assigned to this class.");
+            }
+
+
+            return await GetClassDetailsAsync(classId);
+
         }
     }
 }

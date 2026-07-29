@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.API.DTOs.SchoolClasses;
+using SchoolManagement.API.Entities;
+using SchoolManagement.API.Enums;
 using SchoolManagement.API.Interfaces.Services;
 using System.Security.Claims;
 
@@ -94,12 +96,25 @@ namespace SchoolManagement.API.Controllers
         /// Gets the class details.
         /// </summary>
         [HttpGet("{id}/details")]
-        [Authorize(Policy = "Management")]
+        [Authorize(Policy = "ClassView")]
         public async Task<ActionResult<ClassDetailsDto>> GetDetails(int id)
         {
-            var result =
-                await _schoolClassService
-                    .GetClassDetailsAsync(id);
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var role = Enum.Parse<UserRole>(User.FindFirst(ClaimTypes.Role)!.Value);
+
+            ClassDetailsDto? result;
+
+            if (role == UserRole.Teacher)
+            {
+                result =
+                    await _schoolClassService
+                        .GetTeacherClassDetailsAsync(id, userId);
+            }
+            else
+            {
+                result = await _schoolClassService.GetClassDetailsAsync(id);
+            }
 
 
             if (result == null)

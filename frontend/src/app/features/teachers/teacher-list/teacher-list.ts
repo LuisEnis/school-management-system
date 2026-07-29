@@ -4,7 +4,8 @@ import { RouterLink } from '@angular/router';
 
 import { UserService } from '../../../core/services/user.service';
 import { UserDto } from '../../../core/models/users/user.dto';
-import { Observable } from 'rxjs';
+import { Observable, startWith, Subject, switchMap } from 'rxjs';
+import { AuthService } from '../../../core/services/auth.service';
 
 
 @Component({
@@ -19,19 +20,27 @@ import { Observable } from 'rxjs';
 })
 export class TeacherList implements OnInit {
 
-
+private reload$ = new Subject<void>();
 teachers$!: Observable<UserDto[]>;
 
 
 constructor(
- private userService:UserService
+ private userService:UserService,
+ public authService: AuthService
 ){}
 
 
 
 ngOnInit():void{
 
- this.teachers$ = this.userService.getTeachers();
+  this.teachers$ =
+                this.reload$
+                .pipe(
+                    startWith(null),
+                    switchMap(() =>
+                        this.userService.getTeachers()
+                    )
+                );
 
 }
 
@@ -52,7 +61,7 @@ delete(id:number):void{
 
     next:()=>{
 
-        this.teachers$ = this.userService.getTeachers();
+        this.reload$.next();
 
     },
 
@@ -67,4 +76,8 @@ delete(id:number):void{
 
 }
 
+}
+
+function startWIth(arg0: null): import("rxjs").OperatorFunction<void, unknown> {
+  throw new Error('Function not implemented.');
 }

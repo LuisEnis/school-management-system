@@ -112,7 +112,7 @@ export const routes: Routes = [
         component: TeacherSubjectAssignmentForm
       },
       {
-        path: 'assignments/teaching/new',
+        path: 'assignments/teaching-assignment/new',
         component: TeachingAssignmentForm
       },
       {

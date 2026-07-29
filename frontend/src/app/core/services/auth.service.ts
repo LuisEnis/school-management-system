@@ -5,6 +5,7 @@ import { LoginRequest } from '../models/auth/login-request.dto';
 import { LoginResponse } from '../models/auth/login-response.dto';
 import { UserDetails } from '../models/users/user-details.dto';
 import { environment } from '../../../environments/environment';
+import { UserRole } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -115,5 +116,41 @@ export class AuthService {
     return this.getCurrentUser() !== null;
 
   }
+
+  hasRole(role: UserRole): boolean {
+
+  return this.getCurrentUser()?.role === role;
+
+}
+
+isDirector(): boolean {
+
+  return this.hasRole(UserRole.Director);
+
+}
+
+isSecretary(): boolean {
+
+  return this.hasRole(UserRole.Secretary);
+
+}
+
+isManagement(): boolean {
+
+  return this.isDirector() || this.isSecretary();
+
+}
+
+isTeacher(): boolean {
+
+  return this.hasRole(UserRole.Teacher);
+
+}
+
+isStudent(): boolean {
+
+  return this.hasRole(UserRole.Student);
+
+}
 
 }

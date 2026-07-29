@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 
 import { SchoolClass } from '../../../core/models/schoolClasses/school-class.model';
 import { SchoolClassService } from '../../../core/services/schoolClass.service';
-import { Observable } from 'rxjs';
+import { Observable, startWith, Subject, switchMap } from 'rxjs';
 
 
 @Component({
@@ -19,7 +19,7 @@ import { Observable } from 'rxjs';
 })
 export class SchoolClassList implements OnInit {
 
-
+  private reload$ = new Subject<void>();
   schoolClasses$!: Observable<SchoolClass[]>;
 
 
@@ -32,7 +32,14 @@ export class SchoolClassList implements OnInit {
 
   ngOnInit():void{
 
-    this.schoolClasses$ = this.schoolClassService.getClasses();
+    this.schoolClasses$ =
+        this.reload$
+        .pipe(
+            startWith(null),
+            switchMap(() =>
+                this.schoolClassService.getClasses()
+            )
+        );
 
   }
 
@@ -53,7 +60,7 @@ export class SchoolClassList implements OnInit {
 
         next:()=>{
 
-          this.schoolClasses$ = this.schoolClassService.getClasses();
+          this.reload$.next();
 
         },
 

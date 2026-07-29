@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { SubjectService } from '../../../core/services/subject.service';
-import { Subject } from '../../../core/models/subjects/subject.model';
+import { Subject as SubjectModel } from '../../../core/models/subjects/subject.model';
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, startWith, Subject, switchMap } from 'rxjs';
 
 
 @Component({
@@ -18,8 +18,8 @@ import { Observable } from 'rxjs';
 })
 export class SubjectList implements OnInit {
 
-
-  subjects$!: Observable<Subject[]>;
+  private reload$ = new Subject<void>();
+  subjects$!: Observable<SubjectModel[]>;
 
 
   constructor(
@@ -30,7 +30,14 @@ export class SubjectList implements OnInit {
 
   ngOnInit(): void {
 
-    this.subjects$ = this.subjectService.getAll();
+    this.subjects$ = 
+      this.reload$
+      .pipe(
+        startWith(null),
+          switchMap(() =>
+          this.subjectService.getAll()
+        )
+      );
 
   }
 
@@ -48,7 +55,7 @@ export class SubjectList implements OnInit {
 
         next:()=>{
 
-          this.subjects$ = this.subjectService.getAll();
+          this.reload$.next();
 
         },
 
@@ -65,4 +72,8 @@ export class SubjectList implements OnInit {
 
   }
 
+}
+
+function startWIth(arg0: null): import("rxjs").OperatorFunction<void, unknown> {
+  throw new Error('Function not implemented.');
 }

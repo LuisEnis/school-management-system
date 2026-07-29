@@ -1,174 +1,71 @@
-<div
-class="page-header"
-*ngIf="details">
+<div *ngIf="details$ | async as details">
 
+  <div class="page-header">
+    <h1>Class {{ details.name }}</h1>
+  </div>
 
-<h1>
-Class {{details.name}}
-</h1>
+  <div class="table-container">
 
+    <h2>Students</h2>
 
-</div>
+    <table class="table">
 
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+        </tr>
+      </thead>
 
+      <tbody>
 
+        <tr *ngFor="let student of details.students">
+          <td>{{ student.fullName }}</td>
+          <td>{{ student.email }}</td>
+        </tr>
 
-<div
-class="table-container"
-*ngIf="details">
+        <tr *ngIf="details.students.length === 0">
+          <td colspan="2" class="empty">
+            No students assigned.
+          </td>
+        </tr>
 
+      </tbody>
 
+    </table>
 
-<h2>
-Students
-</h2>
+  </div>
 
+  <div *ngIf="!authService.isTeacher()" class="table-container">
 
+    <h2>Subjects</h2>
 
-<table class="table">
+    <table class="table">
 
-<thead>
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Teacher</th>
+        </tr>
+      </thead>
 
-<tr>
+      <tbody>
 
-<th>
-Name
-</th>
+        <tr *ngFor="let subject of details.subjects">
+          <td>{{ subject.subjectName }}</td>
+          <td>{{ subject.teacherName }}</td>
+        </tr>
 
-<th>
-Email
-</th>
+        <tr *ngIf="details.subjects.length === 0">
+          <td colspan="2" class="empty">
+            No subjects assigned.
+          </td>
+        </tr>
 
-</tr>
+      </tbody>
 
-</thead>
+    </table>
 
-
-
-<tbody>
-
-
-<tr
-*ngFor="let student of details.students">
-
-
-<td>
-{{student.fullName}}
-</td>
-
-
-<td>
-{{student.email}}
-</td>
-
-
-</tr>
-
-
-
-<tr
-*ngIf="details.students.length === 0">
-
-
-<td colspan="2">
-
-No students assigned.
-
-</td>
-
-
-</tr>
-
-
-</tbody>
-
-
-</table>
-
-
-
-</div>
-
-
-
-
-
-<div
-class="table-container"
-*ngIf="details">
-
-
-<h2>
-Subjects
-</h2>
-
-
-
-
-<table class="table">
-
-
-<thead>
-
-<tr>
-
-<th>
-Subject
-</th>
-
-
-<th>
-Teacher
-</th>
-
-
-</tr>
-
-
-</thead>
-
-
-
-
-<tbody>
-
-
-<tr
-*ngFor="let subject of details.subjects">
-
-
-<td>
-{{subject.subjectName}}
-</td>
-
-
-<td>
-{{subject.teacherName}}
-</td>
-
-
-</tr>
-
-
-
-<tr
-*ngIf="details.subjects.length === 0">
-
-
-<td colspan="2">
-
-No subjects assigned.
-
-</td>
-
-
-</tr>
-
-
-</tbody>
-
-
-</table>
-
+  </div>
 
 </div>

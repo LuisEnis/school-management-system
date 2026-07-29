@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { AssignmentService } from '../../../core/services/assignment.service';
 import { StudentClassAssignmentDto } 
 from '../../../core/models/assignments/student-class-assignment.dto';
-import { Observable } from 'rxjs';
+import { Observable, startWith, Subject, switchMap } from 'rxjs';
 
 
 @Component({
@@ -20,7 +20,7 @@ import { Observable } from 'rxjs';
 })
 export class StudentClassAssignment implements OnInit {
 
-
+  private reload$ = new Subject<void>();
   assignments$!: Observable<StudentClassAssignmentDto[]>;
 
 
@@ -32,7 +32,14 @@ export class StudentClassAssignment implements OnInit {
 
   ngOnInit():void {
 
-    this.assignments$ = this.assignmentService.getStudentClassAssignments();
+    this.assignments$ = 
+                 this.reload$
+                 .pipe(
+                   startWith(null),
+                   switchMap(() =>
+                     this.assignmentService.getStudentClassAssignments()
+                   )
+                 );
 
   }
 
@@ -60,7 +67,7 @@ export class StudentClassAssignment implements OnInit {
 
         next:()=>{
 
-          this.assignments$ = this.assignmentService.getStudentClassAssignments();
+          this.reload$.next();
 
         },
 
@@ -77,4 +84,8 @@ export class StudentClassAssignment implements OnInit {
 
   }
 
+}
+
+function startWIth(arg0: null): import("rxjs").OperatorFunction<void, unknown> {
+  throw new Error('Function not implemented.');
 }

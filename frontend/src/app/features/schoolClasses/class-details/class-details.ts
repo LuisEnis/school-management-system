@@ -7,6 +7,8 @@ from '../../../core/services/schoolClass.service';
 
 import { ClassDetailsDto }
 from '../../../core/models/schoolClasses/class-details.dto';
+import { Observable } from 'rxjs';
+import { AuthService } from '../../../core/services/auth.service';
 
 
 
@@ -22,12 +24,13 @@ from '../../../core/models/schoolClasses/class-details.dto';
 export class ClassDetails implements OnInit {
 
 
-details!:ClassDetailsDto;
+details$!: Observable<ClassDetailsDto>;
 
 
 constructor(
  private route:ActivatedRoute,
- private schoolClassService:SchoolClassService
+ private schoolClassService:SchoolClassService,
+ public authService: AuthService
 ){}
 
 
@@ -42,26 +45,8 @@ ngOnInit():void{
  );
 
 
- this.schoolClassService
- .getDetails(id)
- .subscribe({
-
-  next:data=>{
-
-   this.details=data;
-
-  },
-
-  error:error=>{
-
-   console.error(
-    'Failed loading class details',
-    error
-   );
-
-  }
-
- });
+ this.details$ =
+    this.schoolClassService.getDetails(id);
 
 
 }

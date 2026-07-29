@@ -7,7 +7,7 @@ from '../../../core/services/assignment.service';
 
 import { TeachingAssignmentDto }
 from '../../../core/models/assignments/teaching-assignment.dto';
-import { Observable } from 'rxjs';
+import { Observable, startWith, Subject, switchMap } from 'rxjs';
 
 
 
@@ -23,7 +23,7 @@ import { Observable } from 'rxjs';
 })
 export class TeachingAssignment implements OnInit {
 
-
+private reload$ = new Subject<void>();
 assignments$!: Observable<TeachingAssignmentDto[]>;
 
 
@@ -36,7 +36,14 @@ constructor(
 
 ngOnInit():void {
 
- this.assignments$ = this.assignmentService.getTeachingAssignments();
+ this.assignments$ = 
+                    this.reload$
+                    .pipe(
+                      startWith(null),
+                      switchMap(() =>
+                        this.assignmentService.getTeachingAssignments()
+                      )
+                    );
 
 }
 
@@ -66,7 +73,7 @@ this.assignmentService
 
   next:()=>{
 
-   this.assignments$ = this.assignmentService.getTeachingAssignments();
+   this.reload$.next();
 
   }
 
@@ -75,4 +82,8 @@ this.assignmentService
 
 }
 
+}
+
+function startWIth(arg0: null): import("rxjs").OperatorFunction<void, unknown> {
+    throw new Error('Function not implemented.');
 }

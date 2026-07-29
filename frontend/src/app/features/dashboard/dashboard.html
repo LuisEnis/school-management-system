@@ -1,9 +1,193 @@
 <div class="dashboard-container">
 
-  <h1>Dashboard</h1>
+
+  <h1>
+    Dashboard
+  </h1>
+
 
   <p *ngIf="user">
-    Welcome, <b>{{ user.firstName }} {{ user.lastName }}</b> ({{ user.role }})
+
+    Welcome,
+    <b>
+      {{user.firstName}} {{user.lastName}}
+    </b>
+
   </p>
+
+
+
+  <!-- STUDENT DASHBOARD -->
+  <ng-container *ngIf="user?.role === UserRole.Student">
+    <div
+    *ngIf="studentDashboard$ | async as dashboard"
+    class="dashboard-card">
+
+
+      <h2>
+        Class: {{dashboard.className}}
+      </h2>
+
+
+      <h3>
+        Subjects
+      </h3>
+
+
+      <table class="table">
+
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Subject
+            </th>
+
+            <th>
+              Teacher
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+
+        <tbody>
+
+
+          <tr
+          *ngFor="let subject of dashboard.subjects">
+
+
+            <td>
+              {{subject.subjectName}}
+            </td>
+
+
+            <td>
+              {{subject.teacherName}}
+            </td>
+
+
+          </tr>
+
+
+
+          <tr
+          *ngIf="dashboard.subjects.length === 0">
+
+
+            <td colspan="2" class="empty">
+
+              No subjects assigned.
+
+            </td>
+
+
+          </tr>
+
+
+        </tbody>
+
+
+      </table>
+
+
+    </div>
+  </ng-container>  
+
+
+
+
+  <!-- TEACHER DASHBOARD -->
+  <ng-container *ngIf="user?.role === UserRole.Teacher">
+    <div
+    *ngIf="teacherAssignments$ | async as assignments"
+    class="dashboard-card">
+
+
+      <h2>
+        My Classes
+      </h2>
+
+
+
+      <table class="table">
+
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Class
+            </th>
+
+            <th>
+              Subject
+            </th>
+
+            <th>Actions</th>
+
+          </tr>
+
+        </thead>
+
+
+
+        <tbody>
+
+
+          <tr
+          *ngFor="let assignment of assignments">
+
+
+            <td>
+              {{assignment.className}}
+            </td>
+
+
+            <td>
+              {{assignment.subjectName}}
+            </td>
+
+            <td>
+              <a [routerLink]="['/schoolClasses/details', assignment.classId]">
+                Go to class
+              </a>
+            </td>
+
+
+          </tr>
+
+
+
+          <tr
+          *ngIf="assignments.length === 0">
+
+
+            <td colspan="3" class="empty">
+
+              No teaching assignments.
+
+            </td>
+
+
+          </tr>
+
+
+        </tbody>
+
+
+      </table>
+
+
+    </div>
+  </ng-container>
+
+
 
 </div>

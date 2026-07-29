@@ -116,7 +116,8 @@ if(this.isEditMode){
 
  const dto:UpdateUserDto =
  {
-   ...this.form.value
+   ...this.form.value,
+   role:UserRole.Teacher
  };
 
 

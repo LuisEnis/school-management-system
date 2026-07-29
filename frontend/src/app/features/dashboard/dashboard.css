@@ -1,0 +1,78 @@
+.dashboard-container {
+
+  padding: 20px;
+
+}
+
+
+.dashboard-container h1 {
+
+  margin-bottom: 10px;
+
+}
+
+
+
+.dashboard-card {
+
+  margin-top: 25px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+
+}
+
+
+
+.dashboard-card h2 {
+
+  margin-bottom: 20px;
+
+}
+
+
+
+.dashboard-card h3 {
+
+  margin-top: 20px;
+
+}
+
+
+
+
+.table {
+
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+
+}
+
+
+
+.table th,
+.table td {
+
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+
+}
+
+
+
+.table th {
+
+  font-weight: 600;
+
+}
+
+
+
+.empty {
+
+  text-align: center;
+  padding: 20px;
+
+}
