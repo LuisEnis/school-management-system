@@ -16,6 +16,137 @@
   </p>
 
 
+    <!-- MANAGEMENT DASHBOARD -->
+
+  <ng-container
+    *ngIf="
+      user?.role === UserRole.Director ||
+      user?.role === UserRole.Secretary
+    ">
+
+    <div
+      *ngIf="
+        managementDashboard$ | async as dashboard
+      ">
+
+      <div class="dashboard-section">
+
+        <h2>
+          School Overview
+        </h2>
+
+        <div class="stats-grid">
+
+          <div class="stat-card">
+
+            <span class="stat-label">
+              Students
+            </span>
+
+            <span class="stat-value">
+              {{ dashboard.totalStudents }}
+            </span>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <span class="stat-label">
+              Teachers
+            </span>
+
+            <span class="stat-value">
+              {{ dashboard.totalTeachers }}
+            </span>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <span class="stat-label">
+              Classes
+            </span>
+
+            <span class="stat-value">
+              {{ dashboard.totalClasses }}
+            </span>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <span class="stat-label">
+              Subjects
+            </span>
+
+            <span class="stat-value">
+              {{ dashboard.totalSubjects }}
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="dashboard-section">
+
+        <h2>
+          Assignments Overview
+        </h2>
+
+        <div class="stats-grid">
+
+          <div class="stat-card">
+
+            <span class="stat-label">
+              Student-Class Assignments
+            </span>
+
+            <span class="stat-value">
+              {{ dashboard.totalStudentClassAssignments }}
+            </span>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <span class="stat-label">
+              Teacher-Subject Assignments
+            </span>
+
+            <span class="stat-value">
+              {{ dashboard.totalTeacherSubjectAssignments }}
+            </span>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <span class="stat-label">
+              Teaching Assignments
+            </span>
+
+            <span class="stat-value">
+              {{ dashboard.totalTeachingAssignments }}
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </ng-container>
+
 
   <!-- STUDENT DASHBOARD -->
   <ng-container *ngIf="user?.role === UserRole.Student">

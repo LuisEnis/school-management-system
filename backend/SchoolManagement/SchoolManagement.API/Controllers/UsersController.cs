@@ -71,6 +71,20 @@ namespace SchoolManagement.API.Controllers
         }
 
         /// <summary>
+        /// Gets all the secretaries.
+        /// </summary>
+        [HttpGet("secretaries")]
+        [Authorize(Policy = "DirectorOnly")]
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetSecretaries()
+        {
+            var users =
+                await _userService
+                    .GetByRoleAsync(UserRole.Secretary);
+
+            return Ok(users);
+        }
+
+        /// <summary>
         /// Create a new user.
         /// </summary>
         [HttpPost]

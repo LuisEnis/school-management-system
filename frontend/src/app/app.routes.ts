@@ -19,6 +19,9 @@ import { TeacherSubjectAssignmentForm } from './features/assignments/teacher-sub
 import { TeachingAssignmentForm } from './features/assignments/teaching-assignment-form/teaching-assignment-form';
 import { StudentClassAssignment } from './features/assignments/student-class-assignment/student-class-assignment';
 import { TeachingAssignment } from './features/assignments/teaching-assignment/teaching-assignment';
+import { SecretaryList } from './features/secretaries/secretary-list/secretary-list';
+import { SecretaryForm } from './features/secretaries/secretary-form/secretary-form';
+import { Profile } from './features/auth/profile/profile';
 
 export const routes: Routes = [
   {
@@ -38,6 +41,10 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         component: Dashboard
+      },
+      {
+        path: 'profile',
+        component: Profile
       },
       {
         path: 'change-password',
@@ -118,6 +125,18 @@ export const routes: Routes = [
       {
         path:'schoolClasses/details/:id',
         component:ClassDetails
+      },
+      {
+        path: 'secretaries',
+        component: SecretaryList
+      },
+      {
+        path: 'secretaries/new',
+        component: SecretaryForm
+      },
+      {
+        path: 'secretaries/edit/:id',
+        component: SecretaryForm
       }
     ]
   }

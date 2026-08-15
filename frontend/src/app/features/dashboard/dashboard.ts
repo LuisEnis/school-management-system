@@ -15,6 +15,8 @@ from '../../core/models/students/student-dashboard.dto';
 import { TeacherAssignmentDto } 
 from '../../core/models/teachers/teacher-assignment.dto';
 import { RouterLink } from '@angular/router';
+import { ManagementDashboardDto } from '../../core/models/managementDashboard/management-dashboard.dto';
+import { DashboardService } from '../../core/services/dashboard.service';
 
 
 
@@ -38,12 +40,14 @@ export class Dashboard implements OnInit {
 
   teacherAssignments$!: Observable<TeacherAssignmentDto[]>;
 
+  managementDashboard$!: Observable<ManagementDashboardDto>;
 
 
   constructor(
     private authService: AuthService,
     private studentService: StudentService,
-    private teacherService: TeacherService
+    private teacherService: TeacherService,
+    private dashboardService: DashboardService
   ){}
 
 
@@ -59,6 +63,18 @@ export class Dashboard implements OnInit {
   ngOnInit(): void {
 
 
+    if (
+      this.user?.role === UserRole.Director ||
+      this.user?.role === UserRole.Secretary
+    ) {
+
+      this.managementDashboard$ =
+        this.dashboardService
+          .getManagementDashboard();
+
+    }
+    
+    
     if(this.user?.role === UserRole.Student){
 
       this.studentDashboard$ =

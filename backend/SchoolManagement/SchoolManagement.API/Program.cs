@@ -18,7 +18,7 @@ namespace SchoolManagement.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -100,6 +100,7 @@ namespace SchoolManagement.API
             builder.Services.AddScoped<IAssignmentService, AssignmentService>();
             builder.Services.AddScoped<ITeacherService, TeacherService>();
             builder.Services.AddScoped<IStudentService, StudentService>();
+            builder.Services.AddScoped<IManagementDashboardService, ManagementDashboardService>();
 
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
@@ -190,6 +191,8 @@ namespace SchoolManagement.API
             });
 
             var app = builder.Build();
+
+            await DatabaseInitializer.InitializeAsync(app.Services);
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

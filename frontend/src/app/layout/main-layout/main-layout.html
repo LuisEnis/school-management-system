@@ -7,11 +7,13 @@
       <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
       <a *ngIf="authService.isManagement()" routerLink="/students" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Students</a>
       <a *ngIf="authService.isManagement()" routerLink="/teachers" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Teachers</a>
+      <a *ngIf="authService.isDirector()" routerLink="/secretaries" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Secretaries</a>
       <a *ngIf="authService.isManagement()" routerLink="/schoolClasses" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Classes</a>
       <a *ngIf="authService.isManagement()" routerLink="/subjects" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Subjects</a>
       <a *ngIf="authService.isManagement()" routerLink="/assignments/student-class" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Student-Class Assignments</a>
       <a *ngIf="authService.isManagement()" routerLink="/assignments/teacher-subject" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Teacher-Subject Assignments</a>
       <a *ngIf="authService.isManagement()" routerLink="/assignments/teaching-assignment" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Teaching Assignments</a>
+      <a *ngIf="authService.isDirector()" routerLink="/profile" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">My Profile</a>
       <a routerLink="/change-password" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Change password</a>
     </nav>
 

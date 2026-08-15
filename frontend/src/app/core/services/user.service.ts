@@ -51,6 +51,15 @@ getTeachers():Observable<UserDto[]>{
 }
 
 
+getSecretaries(): Observable<UserDto[]> {
+
+  return this.http.get<UserDto[]>(
+    `${this.apiUrl}/secretaries`
+  );
+
+}
+
+
 getUserById(
  id:number
 ):Observable<UserDetails>{

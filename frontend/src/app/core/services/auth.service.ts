@@ -109,7 +109,16 @@ export class AuthService {
       return null;
   }
 
+  updateCurrentUser(user: UserDetails): void {
 
+    this.currentUser = user;
+
+    localStorage.setItem(
+      'user',
+      JSON.stringify(user)
+    );
+
+  }
 
   isLoggedIn():boolean {
 
