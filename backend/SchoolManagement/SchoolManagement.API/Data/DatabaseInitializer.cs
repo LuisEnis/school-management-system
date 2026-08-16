@@ -21,6 +21,10 @@ namespace SchoolManagement.API.Data
                 scope.ServiceProvider
                     .GetRequiredService<IPasswordHasherService>();
 
+            var configuration =
+                scope.ServiceProvider
+                    .GetRequiredService<IConfiguration>();
+
 
             // Apply pending migrations
             await context.Database.MigrateAsync();
@@ -37,13 +41,26 @@ namespace SchoolManagement.API.Data
                 return;
 
 
+            // Read default Director configuration
+            var directorSection =
+                configuration.GetSection("DefaultDirector");
+
+
             // Create default Director
             var director = new User
             {
-                Username = "admin",
-                FirstName = "System",
-                LastName = "Administrator",
-                Email = "admin@schoolmanagement.com",
+                Username =
+                    directorSection["Username"]!,
+
+                FirstName =
+                    directorSection["FirstName"]!,
+
+                LastName =
+                    directorSection["LastName"]!,
+
+                Email =
+                    directorSection["Email"]!,
+
                 Role = UserRole.Director
             };
 
@@ -51,7 +68,7 @@ namespace SchoolManagement.API.Data
             director.PasswordHash =
                 passwordHasher.HashPassword(
                     director,
-                    "admin123");
+                    directorSection["Password"]!);
 
 
             context.Users.Add(director);

@@ -2,6 +2,9 @@ import { Routes } from '@angular/router';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { Login } from './features/auth/login/login';
 import { authGuard } from './core/guards/auth.guard';
+import { managementGuard } from './core/guards/management.guard';
+import { directorGuard } from './core/guards/director.guard';
+import { classViewGuard } from './core/guards/class-view.guard';
 import { Dashboard } from './features/dashboard/dashboard';
 import { StudentList } from './features/students/student-list/student-list';
 import { StudentForm } from './features/students/student-form/student-form';
@@ -44,7 +47,8 @@ export const routes: Routes = [
       },
       {
         path: 'profile',
-        component: Profile
+        component: Profile,
+        canActivate: [directorGuard]
       },
       {
         path: 'change-password',
@@ -52,91 +56,113 @@ export const routes: Routes = [
       },
       {
       path: 'students',
-        component: StudentList
+        component: StudentList,
+        canActivate: [managementGuard]
       },
       {
         path: 'students/new',
-        component: StudentForm
+        component: StudentForm,
+        canActivate: [managementGuard]
       },
       {
         path: 'students/edit/:id',
-        component: StudentForm
+        component: StudentForm,
+        canActivate: [managementGuard]
       },
       {
         path: 'teachers',
-        component: TeacherList
+        component: TeacherList,
+        canActivate: [managementGuard]
       },
       {
         path: 'teachers/new',
-        component: TeacherForm
+        component: TeacherForm,
+        canActivate: [directorGuard]
       },
       {
         path: 'teachers/edit/:id',
-        component: TeacherForm
+        component: TeacherForm,
+        canActivate: [directorGuard]
       },
       {
         path: 'subjects',
-        component: SubjectList
+        component: SubjectList,
+        canActivate: [managementGuard]
       },
       {
         path: 'subjects/new',
-        component: SubjectForm
+        component: SubjectForm,
+        canActivate: [managementGuard]
       },
       {
         path: 'subjects/edit/:id',
-        component: SubjectForm
+        component: SubjectForm,
+        canActivate: [managementGuard]
       },
       {
         path: 'schoolClasses',
-        component: SchoolClassList
+        component: SchoolClassList,
+        canActivate: [managementGuard]
       },
       {
         path: 'schoolClasses/new',
-        component: SchoolClassForm
+        component: SchoolClassForm,
+        canActivate: [managementGuard]
       },
       {
         path: 'schoolClasses/edit/:id',
-        component: SchoolClassForm
+        component: SchoolClassForm,
+        canActivate: [managementGuard]
       },
       {
         path: 'assignments/student-class',
-        component: StudentClassAssignment
+        component: StudentClassAssignment,
+        canActivate: [managementGuard]
       },
       {
         path: 'assignments/teacher-subject',
-        component: TeacherSubjectAssignment
+        component: TeacherSubjectAssignment,
+        canActivate: [managementGuard]
       },
       {
         path: 'assignments/teaching-assignment',
-        component: TeachingAssignment
+        component: TeachingAssignment,
+        canActivate: [managementGuard]
       },
       {
         path: 'assignments/student-class/new',
-        component: StudentClassAssignmentForm
+        component: StudentClassAssignmentForm,
+        canActivate: [managementGuard]
       },
       {
         path: 'assignments/teacher-subject/new',
-        component: TeacherSubjectAssignmentForm
+        component: TeacherSubjectAssignmentForm,
+        canActivate: [managementGuard]
       },
       {
         path: 'assignments/teaching-assignment/new',
-        component: TeachingAssignmentForm
+        component: TeachingAssignmentForm,
+        canActivate: [managementGuard]
       },
       {
         path:'schoolClasses/details/:id',
-        component:ClassDetails
+        component:ClassDetails,
+        canActivate: [classViewGuard]
       },
       {
         path: 'secretaries',
-        component: SecretaryList
+        component: SecretaryList,
+        canActivate: [directorGuard]
       },
       {
         path: 'secretaries/new',
-        component: SecretaryForm
+        component: SecretaryForm,
+        canActivate: [directorGuard]
       },
       {
         path: 'secretaries/edit/:id',
-        component: SecretaryForm
+        component: SecretaryForm,
+        canActivate: [directorGuard]
       }
     ]
   }
