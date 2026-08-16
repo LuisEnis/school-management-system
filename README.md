@@ -21,6 +21,7 @@ The project is being developed as a practical full-stack application with a focu
 * Repository + Service layered architecture
 * Custom exception handling middleware
 * Password hashing with ASP.NET Core Identity
+* Automatic database migration and initialization
 * SignalR planned
 
 ### Frontend
@@ -34,6 +35,7 @@ The project is being developed as a practical full-stack application with a focu
 * HTTP Interceptors
 * RxJS / Observables
 * Role-based UI rendering
+* Role-based route protection
 * Responsive custom CSS
 
 ---
@@ -42,14 +44,16 @@ The project is being developed as a practical full-stack application with a focu
 
 The system supports four roles:
 
-| Role          | Description                                                                             |
-| ------------- | --------------------------------------------------------------------------------------- |
-| **Director**  | Full access to the management system, including creating, editing and deleting teachers |
-| **Secretary** | Access to management pages and data, but cannot modify teachers                         |
-| **Teacher**   | Access to their dashboard, assigned classes and change password                         |
-| **Student**   | Access to their dashboard and change password                                           |
+| Role | Description |
+| --- | --- |
+| **Director** | Full access to the management system, including managing teachers and secretaries |
+| **Secretary** | Access to management pages and data, but cannot manage teachers or secretaries |
+| **Teacher** | Access to their dashboard, assigned classes and change password |
+| **Student** | Access to their dashboard and change password |
 
-Authorization is implemented both on the **backend** and **frontend**. Frontend restrictions improve the user experience, while backend authorization provides the actual security boundary.
+Authorization is implemented both on the **backend** and **frontend**.
+
+Frontend guards and UI restrictions improve the user experience, while backend authorization provides the actual security boundary.
 
 ---
 
@@ -62,11 +66,14 @@ Authorization is implemented both on the **backend** and **frontend**. Frontend 
 * Role-based authorization policies
 * Protected API endpoints
 * Angular authentication guard
+* Role-based Angular route guards
 * JWT HTTP interceptor
 * Role-based navigation
 * Role-based UI actions
 * Change password functionality
+* Director profile management
 * Secure password hashing
+* Default Director initialization
 
 ### Students
 
@@ -90,6 +97,19 @@ Authorization is implemented both on the **backend** and **frontend**. Frontend 
 * View classes and subjects taught
 * View students belonging to classes they teach
 
+Teacher creation, editing and deletion are restricted to the Director.
+
+Secretaries can view teachers but cannot modify them.
+
+### Secretaries
+
+* View secretaries
+* Create secretaries
+* Edit secretaries
+* Delete secretaries
+
+Secretary management is restricted to the Director.
+
 ### Subjects
 
 * Create subjects
@@ -97,6 +117,8 @@ Authorization is implemented both on the **backend** and **frontend**. Frontend 
 * Edit subjects
 * Delete subjects
 * Assign subjects to teachers
+
+Both Directors and Secretaries can manage subjects.
 
 ### Classes
 
@@ -107,6 +129,10 @@ Authorization is implemented both on the **backend** and **frontend**. Frontend 
 * View class details
 * View students assigned to a class
 * View subjects and teachers assigned to a class
+
+Both Directors and Secretaries can manage classes.
+
+Teachers can access class details only for classes where they are assigned to teach.
 
 ### Assignments
 
@@ -143,9 +169,34 @@ Teachers can see:
 
 ### Director & Secretary Dashboard
 
-The dashboard currently contains the basic welcome information.
+Management users have a dedicated management dashboard containing statistics and overview information about the school.
 
-Additional management statistics and overview information can be added in the future.
+The dashboard provides management-level information such as:
+
+* Total number of students
+* Total number of teachers
+* Total number of secretaries
+* Total number of classes
+* Total number of subjects
+
+The management dashboard is provided through dedicated backend endpoints and an Angular dashboard service.
+
+---
+
+## 👤 Director Profile
+
+The Director can update their own account information through the profile page.
+
+The profile allows the Director to update:
+
+* Username
+* First Name
+* Last Name
+* Email
+
+Password changes are handled separately through the existing **Change Password** functionality.
+
+The profile page is protected so that only the Director can access it.
 
 ---
 
@@ -153,13 +204,41 @@ Additional management statistics and overview information can be added in the fu
 
 The application uses both backend and frontend authorization.
 
+### Backend
+
+ASP.NET Core authorization policies are used to protect API endpoints, including:
+
+* `Management`
+* `DirectorOnly`
+* `TeacherOnly`
+* `StudentOnly`
+* `ClassView`
+
+Business rules are also enforced inside the service layer.
+
 For example:
 
-* Students and teachers cannot see management navigation items.
-* Secretaries can view teachers but cannot create, edit or delete them.
-* Only directors can manage teacher creation, editing and deletion.
-* Teachers can access class details only for classes where they are assigned to teach.
-* Backend authorization prevents users from bypassing frontend restrictions.
+* Secretaries can only create, update and delete students.
+* Secretaries cannot create, update or delete teachers.
+* Only Directors can manage secretaries.
+* Only Directors can create, edit or delete teachers.
+* Only Directors can update their profile.
+* Teachers can access class details only for classes they teach.
+
+### Frontend
+
+Angular route guards prevent unauthorized users from navigating directly to protected pages.
+
+The frontend uses guards for:
+
+* Authentication
+* Management pages
+* Director-only pages
+* Class details
+
+Role-based UI rendering is also used to hide actions that the current user cannot perform.
+
+Frontend authorization is not considered a security boundary by itself; the backend always performs the final authorization checks.
 
 ---
 
@@ -190,7 +269,6 @@ SchoolManagement
 ```
 
 The general request flow is:
-
 ```text
 Controller
     ↓
@@ -202,15 +280,10 @@ Entity Framework Core
     ↓
 SQL Server
 ```
-
 DTOs are used between the API and clients instead of exposing database entities directly.
-
 ---
-
 ## 🛡️ Validation & Business Rules
-
 The backend contains business validation for scenarios such as:
-
 * Preventing duplicate class names
 * Preventing duplicate subject names
 * Preventing duplicate assignments
@@ -221,31 +294,20 @@ The backend contains business validation for scenarios such as:
 * Email uniqueness validation
 * Restricting teachers to classes they actually teach
 * Role-based endpoint authorization
-
 API exceptions are handled centrally through custom exception handling middleware.
-
 ---
-
 ## 📖 API Documentation
-
 The backend includes **Swagger / OpenAPI** documentation for testing and exploring the API.
-
 Swagger can be used to:
-
 * View available endpoints
 * Inspect request/response models
 * Test CRUD operations
 * Authenticate using JWT
 * Test role-protected endpoints
-
 ---
-
 ## 🗄️ Database
-
 The application uses **SQL Server** with **Entity Framework Core**.
-
 Main entities include:
-
 * User
 * SchoolClass
 * Subject
@@ -255,12 +317,24 @@ Main entities include:
 
 The relationships between these entities allow the system to represent students, teachers, classes, subjects, and teaching assignments.
 
+Automatic Database Initialization
+
+The application contains a DatabaseInitializer that runs when the API starts.
+
+It:
+
+Applies any pending Entity Framework Core migrations automatically.
+Checks whether a Director already exists.
+Creates a default Director if no Director exists.
+
+This allows a new database to be initialized automatically when the application starts.
+
+The default Director information is configured through appsettings.json.
+
+The application therefore does not require manually running Update-Database every time a new database is started, as pending migrations are automatically applied by the application.
 ---
-
 ## 📁 Frontend Structure
-
 The Angular application is organized by features and shared core functionality:
-
 ```text
 src/app
 │
@@ -282,15 +356,10 @@ src/app
 └── layout
     └── main-layout
 ```
-
 The frontend uses Angular standalone components and Reactive Forms.
-
 ---
-
 ## 🔄 Current Development Status
-
 ### Completed
-
 * Backend project architecture
 * Database entities and relationships
 * Entity Framework Core configuration
@@ -317,24 +386,17 @@ The frontend uses Angular standalone components and Reactive Forms.
 * Role-based frontend actions
 * Student dashboard
 * Teacher dashboard
+* Director/Secretary management dashboard
 * Teacher class access validation
 * Backend/frontend integration and testing
-
 ### Planned / Remaining
-
-* Improve the Director/Secretary dashboard with management statistics
 * Final frontend/backend testing and cleanup
 * SignalR integration
 * Additional UI polishing and improvements
-
 ---
-
 ## 🧪 Testing
-
 The API has been tested using **Swagger** and **Postman** during development.
-
 Frontend functionality is tested through the Angular application by verifying:
-
 * Authentication
 * Role-based navigation
 * CRUD operations
@@ -343,71 +405,61 @@ Frontend functionality is tested through the Angular application by verifying:
 * Dashboard data
 * Authorization behavior
 * API integration
-
 ---
-
 ## ⚙️ Running the Project
-
 ### Backend
-
 1. Clone the repository.
-
 2. Open the backend solution in Visual Studio.
-
-3. Configure the SQL Server connection string in:
-
+3. Configure the SQL Server connection string and default director configuration in:
 ```text
 appsettings.json
 ```
-
 Example:
-
 ```json
 {
   "ConnectionStrings": {
     "DefaultConnection": "Server=localhost;Database=SchoolManagementDb;Trusted_Connection=True;TrustServerCertificate=True"
+  },
+  "DefaultDirector": {
+    "Username": "admin",
+    "FirstName": "System",
+    "LastName": "Administrator",
+    "Email": "admin@schoolmanagement.com",
+    "Password": "admin123"
   }
 }
 ```
+4. Run the ASP.NET Core API.
 
-4. Apply the Entity Framework migrations:
+On startup, the application will automatically:
 
-```powershell
-Update-Database
-```
+* Apply any pending Entity Framework Core migrations.
+* Check whether a Director already exists.
+* Create the default Director if no Director exists.
 
-5. Run the ASP.NET Core API.
+The default Director can then log in and change their profile information and password.
 
+Note: Update-Database is not required for normal application startup because pending migrations are automatically applied by the DatabaseInitializer.
+
+Security: The default Director password in appsettings.json is intended for development/initialization purposes. For a real deployment, the password should be stored securely using environment variables, user secrets, or another secure configuration mechanism.
 Swagger will be available when the API is running.
-
 ### Frontend
-
 Navigate to the Angular project:
-
 ```bash
 cd frontend
 ```
-
 Install dependencies:
-
 ```bash
 npm install
 ```
-
 Start the development server:
-
 ```bash
 ng serve
 ```
-
 Then open the application in the browser.
-
 ---
-
 ## 🔑 Authentication Flow
-
 The application uses JWT-based authentication.
-
 ```text
 Login
   ↓
@@ -423,17 +475,11 @@ HTTP Interceptor adds Bearer token
   ↓
 Protected API endpoints
 ```
-
 The authenticated user's role determines which functionality is available.
-
 ---
-
 ## 🎯 Project Goals
-
 This project was created to practice and demonstrate full-stack development using technologies commonly used in modern enterprise applications.
-
 The main goals are:
-
 * Build a complete REST API with ASP.NET Core
 * Apply layered architecture
 * Work with Entity Framework Core and SQL Server
@@ -443,14 +489,11 @@ The main goals are:
 * Apply business rules and validation
 * Work with role-based applications
 * Practice API testing with Swagger and Postman
+* Implement automatic database initialization
 * Build a project that can be extended with real-time functionality using SignalR
-
 ---
-
 ## 📌 Future Improvements
-
 Possible future improvements include:
-
 * SignalR notifications and real-time updates
 * More detailed management dashboards
 * Attendance management
@@ -459,11 +502,8 @@ Possible future improvements include:
 * Improved error handling and user feedback
 * More extensive automated testing
 * Deployment to a cloud platform
-
 ---
-
 ## 👨‍💻 Author
-
 **Enis Sejdini**
-
 Full-Stack Software Developer focused primarily on **.NET / ASP.NET Core backend development**, with experience building Angular frontends and working with databases, APIs, authentication, Docker, messaging and cloud technologies.
+ 		
