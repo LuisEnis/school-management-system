@@ -1,13 +1,19 @@
-﻿using SchoolManagement.API.Entities;
+﻿using SchoolManagement.API.DTOs.Common;
+using SchoolManagement.API.DTOs.Users;
+using SchoolManagement.API.Entities;
 using SchoolManagement.API.Enums;
 
 namespace SchoolManagement.API.Interfaces.Repositories
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<User>> GetAllAsync();
+        Task<PagedResult<User>> GetAllAsync(PaginationRequest request);
 
-        Task<IEnumerable<User>> GetByRoleAsync(UserRole role);
+        Task<PagedResult<User>> GetByRoleAsync(UserRole role, PaginationRequest request);
+
+        Task<IEnumerable<User>> GetAllByRoleAsync(UserRole role);
+
+        Task<int> CountByRoleAsync(UserRole role);
 
         Task<User?> GetByIdAsync(int id);
 

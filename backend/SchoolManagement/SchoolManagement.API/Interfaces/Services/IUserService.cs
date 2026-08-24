@@ -1,13 +1,16 @@
-﻿using SchoolManagement.API.DTOs.Users;
+﻿using SchoolManagement.API.DTOs.Common;
+using SchoolManagement.API.DTOs.Users;
 using SchoolManagement.API.Enums;
 
 namespace SchoolManagement.API.Interfaces.Services
 {
     public interface IUserService
     {
-        Task<IEnumerable<UserDto>> GetAllAsync();
+        Task<PagedResult<UserDto>> GetAllAsync(PaginationRequest request);
 
-        Task<IEnumerable<UserDto>> GetByRoleAsync(UserRole role);
+        Task<PagedResult<UserDto>> GetByRoleAsync(UserRole role, PaginationRequest request);
+
+        Task<IEnumerable<UserDto>> GetAllByRoleAsync(UserRole role);
 
         Task<UserDetailsDto?> GetByIdAsync(int id);
 

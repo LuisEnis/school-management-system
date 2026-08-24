@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SchoolManagement.API.DTOs.Common;
 using SchoolManagement.API.DTOs.Users;
 using SchoolManagement.API.Entities;
 using SchoolManagement.API.Enums;
@@ -27,16 +28,36 @@ namespace SchoolManagement.API.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<UserDto>> GetAllAsync()
+        public async Task<PagedResult<UserDto>> GetAllAsync(PaginationRequest request)
         {
-            var users = await _userRepository.GetAllAsync();
+            var result = await _userRepository.GetAllAsync(request);
 
-            return _mapper.Map<IEnumerable<UserDto>>(users);
+            return new PagedResult<UserDto>
+            {
+                Items = _mapper.Map<IEnumerable<UserDto>>(result.Items),
+                PageNumber = result.PageNumber,
+                PageSize = result.PageSize,
+                TotalCount = result.TotalCount
+            };
         }
 
-        public async Task<IEnumerable<UserDto>> GetByRoleAsync(UserRole role)
+        public async Task<PagedResult<UserDto>> GetByRoleAsync(UserRole role, PaginationRequest request)
         {
-            var users = await _userRepository.GetByRoleAsync(role);
+            var result = await _userRepository
+                .GetByRoleAsync(role, request);
+
+            return new PagedResult<UserDto>
+            {
+                Items = _mapper.Map<IEnumerable<UserDto>>(result.Items),
+                PageNumber = result.PageNumber,
+                PageSize = result.PageSize,
+                TotalCount = result.TotalCount
+            };
+        }
+
+        public async Task<IEnumerable<UserDto>> GetAllByRoleAsync(UserRole role)
+        {
+            var users = await _userRepository.GetAllByRoleAsync(role);
 
             return _mapper.Map<IEnumerable<UserDto>>(users);
         }

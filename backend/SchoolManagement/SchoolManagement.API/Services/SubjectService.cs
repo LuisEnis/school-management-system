@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SchoolManagement.API.DTOs.Common;
 using SchoolManagement.API.DTOs.Subjects;
 using SchoolManagement.API.Entities;
 using SchoolManagement.API.Exceptions;
@@ -24,9 +25,22 @@ namespace SchoolManagement.API.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<SubjectDto>> GetAllAsync()
+        public async Task<PagedResult<SubjectDto>> GetAllAsync(PaginationRequest request)
         {
-            var subjects = await _subjectRepository.GetAllAsync();
+            var result = await _subjectRepository.GetAllAsync(request);
+
+            return new PagedResult<SubjectDto>
+            {
+                Items = _mapper.Map<IEnumerable<SubjectDto>>(result.Items),
+                PageNumber = result.PageNumber,
+                PageSize = result.PageSize,
+                TotalCount = result.TotalCount
+            };
+        }
+
+        public async Task<IEnumerable<SubjectDto>> GetAllUnpagedAsync()
+        {
+            var subjects = await _subjectRepository.GetAllUnpagedAsync();
 
             return _mapper.Map<IEnumerable<SubjectDto>>(subjects);
         }

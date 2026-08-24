@@ -1,10 +1,13 @@
-﻿using SchoolManagement.API.DTOs.SchoolClasses;
+﻿using SchoolManagement.API.DTOs.Common;
+using SchoolManagement.API.DTOs.SchoolClasses;
 
 namespace SchoolManagement.API.Interfaces.Services
 {
     public interface ISchoolClassService
     {
-        Task<IEnumerable<SchoolClassDto>> GetAllAsync();
+        Task<PagedResult<SchoolClassDto>> GetAllAsync(PaginationRequest request);
+
+        Task<IEnumerable<SchoolClassDto>> GetAllUnpagedAsync();
 
         Task<SchoolClassDto?> GetByIdAsync(int id);
 

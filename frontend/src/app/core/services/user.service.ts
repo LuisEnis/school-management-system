@@ -9,6 +9,7 @@ import { UserDetails } from '../models/users/user-details.dto';
 import { CreateUserDto } from '../models/users/create-user.dto';
 import { UpdateUserDto } from '../models/users/update-user.dto';
 import { ChangePasswordDto } from '../models/users/change-password.dto';
+import { PagedResult } from '../models/common/paged-result.model';
 
 @Injectable({
   providedIn:'root'
@@ -33,28 +34,53 @@ getAll(): Observable<UserDto[]> {
 }
 
 
-getStudents():Observable<UserDto[]>{
+getStudents(
+  pageNumber: number = 1,
+  pageSize: number = 15
+): Observable<PagedResult<UserDto>> {
+
+  return this.http.get<PagedResult<UserDto>>(
+    `${this.apiUrl}/students?pageNumber=${pageNumber}&pageSize=${pageSize}`
+  );
+
+}
+
+getAllStudents():Observable<UserDto[]>{
 
  return this.http.get<UserDto[]>(
- `${this.apiUrl}/students`
+ `${this.apiUrl}/students/all`
  );
 
 }
 
 
-getTeachers():Observable<UserDto[]>{
+getTeachers(
+  pageNumber: number = 1,
+  pageSize: number = 15
+): Observable<PagedResult<UserDto>> {
+
+  return this.http.get<PagedResult<UserDto>>(
+    `${this.apiUrl}/teachers?pageNumber=${pageNumber}&pageSize=${pageSize}`
+  );
+
+}
+
+getAllTeachers():Observable<UserDto[]>{
 
  return this.http.get<UserDto[]>(
- `${this.apiUrl}/teachers`
+ `${this.apiUrl}/teachers/all`
  );
 
 }
 
 
-getSecretaries(): Observable<UserDto[]> {
+getSecretaries(
+  pageNumber: number = 1,
+  pageSize: number = 15
+): Observable<PagedResult<UserDto>> {
 
-  return this.http.get<UserDto[]>(
-    `${this.apiUrl}/secretaries`
+  return this.http.get<PagedResult<UserDto>>(
+    `${this.apiUrl}/secretaries?pageNumber=${pageNumber}&pageSize=${pageSize}`
   );
 
 }

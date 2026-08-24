@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SchoolManagement.API.DTOs.Common;
 using SchoolManagement.API.DTOs.Subjects;
 using SchoolManagement.API.Interfaces.Services;
 
@@ -21,9 +22,20 @@ namespace SchoolManagement.API.Controllers
         /// Retrieves all subjects.
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SubjectDto>>> GetAll()
+        public async Task<ActionResult<PagedResult<SubjectDto>>> GetAll([FromQuery] PaginationRequest request)
         {
-            var subjects = await _subjectService.GetAllAsync();
+            var subjects = await _subjectService.GetAllAsync(request);
+
+            return Ok(subjects);
+        }
+
+        /// <summary>
+        /// Retrieves all subjects.
+        /// </summary>
+        [HttpGet("all")]
+        public async Task<ActionResult<IEnumerable<SubjectDto>>> GetAllUnpaged()
+        {
+            var subjects = await _subjectService.GetAllUnpagedAsync();
 
             return Ok(subjects);
         }

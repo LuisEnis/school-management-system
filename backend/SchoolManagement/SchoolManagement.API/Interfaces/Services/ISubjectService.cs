@@ -1,10 +1,13 @@
-﻿using SchoolManagement.API.DTOs.Subjects;
+﻿using SchoolManagement.API.DTOs.Common;
+using SchoolManagement.API.DTOs.Subjects;
 
 namespace SchoolManagement.API.Interfaces.Services
 {
     public interface ISubjectService
     {
-        Task<IEnumerable<SubjectDto>> GetAllAsync();
+        Task<PagedResult<SubjectDto>> GetAllAsync(PaginationRequest request);
+
+        Task<IEnumerable<SubjectDto>> GetAllUnpagedAsync();
 
         Task<SubjectDto?> GetByIdAsync(int id);
 

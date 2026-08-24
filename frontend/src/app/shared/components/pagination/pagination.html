@@ -1,0 +1,101 @@
+<div
+  class="pagination-container"
+  *ngIf="totalCount > 0">
+
+  <!-- Information -->
+  <div class="pagination-info">
+
+    <span>
+      Showing
+
+      <strong>
+        {{ (pageNumber - 1) * pageSize + 1 }}
+      </strong>
+
+      -
+
+      <strong>
+        {{ Math.min(pageNumber * pageSize, totalCount) }}
+      </strong>
+
+      of
+
+      <strong>
+        {{ totalCount }}
+      </strong>
+    </span>
+
+  </div>
+
+
+  <!-- Page navigation -->
+  <div class="pagination-controls">
+
+    <button
+      class="pagination-btn"
+      [disabled]="pageNumber === 1"
+      (click)="goToPage(pageNumber - 1)">
+
+      Previous
+
+    </button>
+
+
+    <button
+      *ngFor="let page of pageNumbers"
+      class="pagination-btn page-number"
+      [class.active]="page === pageNumber"
+      (click)="goToPage(page)">
+
+      {{ page }}
+
+    </button>
+
+
+    <button
+      class="pagination-btn"
+      [disabled]="pageNumber === totalPages"
+      (click)="goToPage(pageNumber + 1)">
+
+      Next
+
+    </button>
+
+  </div>
+
+
+  <!-- Page size -->
+  <div class="page-size-container">
+
+  <label for="pageSizeSelect">
+    Rows per page:
+  </label>
+
+  <select
+    id="pageSizeSelect"
+    [value]="pageSize"
+    (change)="onPageSizeSelect($event)">
+
+    <option value="15">15</option>
+    <option value="20">20</option>
+    <option value="25">25</option>
+    <option value="50">50</option>
+    <option value="100">100</option>
+
+  </select>
+
+
+  <span>or</span>
+
+
+  <input
+    type="number"
+    min="1"
+    [value]="pageSizeInput"
+    (change)="onCustomPageSize($event)"
+    (keyup.enter)="onCustomPageSize($event)"
+    placeholder="Custom">
+
+</div>
+
+</div>

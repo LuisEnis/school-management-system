@@ -26,17 +26,17 @@ namespace SchoolManagement.API.Services
 
         public async Task<ManagementDashboardDto> GetDashboardAsync()
         {
-            var students =
-                await _userRepository.GetByRoleAsync(UserRole.Student);
+            var totalStudents =
+                await _userRepository.CountByRoleAsync(UserRole.Student);
 
-            var teachers =
-                await _userRepository.GetByRoleAsync(UserRole.Teacher);
+            var totalTeachers =
+                await _userRepository.CountByRoleAsync(UserRole.Teacher);
 
-            var classes =
-                await _schoolClassRepository.GetAllAsync();
+            var totalClasses =
+                await _schoolClassRepository.CountAsync();
 
-            var subjects =
-                await _subjectRepository.GetAllAsync();
+            var totalSubjects =
+                await _subjectRepository.CountAsync();
 
             var studentClassAssignments =
                 await _assignmentRepository.GetStudentClassAssignmentsAsync();
@@ -49,13 +49,13 @@ namespace SchoolManagement.API.Services
 
             return new ManagementDashboardDto
             {
-                TotalStudents = students.Count(),
+                TotalStudents = totalStudents,
 
-                TotalTeachers = teachers.Count(),
+                TotalTeachers = totalTeachers,
 
-                TotalClasses = classes.Count(),
+                TotalClasses = totalClasses,
 
-                TotalSubjects = subjects.Count(),
+                TotalSubjects = totalSubjects,
 
                 TotalStudentClassAssignments =
                     studentClassAssignments.Count(),

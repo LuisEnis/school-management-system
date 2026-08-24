@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { Subject } from '../models/subjects/subject.model';
 import { CreateSubjectDto } from '../models/subjects/create-subject.dto';
 import { UpdateSubjectDto } from '../models/subjects/update-subject.dto';
+import { PagedResult } from '../models/common/paged-result.model';
 
 
 @Injectable({
@@ -22,14 +23,25 @@ export class SubjectService {
   ) {}
 
 
-  getAll(): Observable<Subject[]> {
+  getAll(
+    pageNumber: number = 1,
+    pageSize: number = 15
+  ): Observable<PagedResult<Subject>> {
 
-    return this.http.get<Subject[]>(
-      this.apiUrl
+    return this.http.get<PagedResult<Subject>>(
+      `${this.apiUrl}?pageNumber=${pageNumber}&pageSize=${pageSize}`
     );
 
   }
 
+  getAllSubjects(): Observable<Subject[]> {
+
+    return this.http.get<Subject[]>(
+      `${this.apiUrl}/all`
+    );
+
+  }
+  
 
   getById(id:number): Observable<Subject> {
 

@@ -3,7 +3,9 @@ import { RouterLink } from '@angular/router';
 import { SubjectService } from '../../../core/services/subject.service';
 import { Subject as SubjectModel } from '../../../core/models/subjects/subject.model';
 import { Component, OnInit } from '@angular/core';
-import { Observable, startWith, Subject, switchMap } from 'rxjs';
+import { map, Observable, startWith, Subject, switchMap, tap } from 'rxjs';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination';
+import { PagedResult } from '../../../core/models/common/paged-result.model';
 
 
 @Component({
@@ -11,7 +13,8 @@ import { Observable, startWith, Subject, switchMap } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink
+    RouterLink,
+    PaginationComponent
   ],
   templateUrl: './subject-list.html',
   styleUrl: './subject-list.css'
@@ -20,6 +23,10 @@ export class SubjectList implements OnInit {
 
   private reload$ = new Subject<void>();
   subjects$!: Observable<SubjectModel[]>;
+  pageNumber = 1;
+  pageSize = 15;
+  totalPages = 0;
+  totalCount = 0;
 
 
   constructor(
@@ -35,9 +42,32 @@ export class SubjectList implements OnInit {
       .pipe(
         startWith(null),
           switchMap(() =>
-          this.subjectService.getAll()
-        )
+          this.subjectService.getAll(this.pageNumber, this.pageSize)
+        ),
+        tap((result: PagedResult<SubjectModel>) => {
+          this.totalPages = result.totalPages;
+          this.totalCount = result.totalCount;
+        }),
+        map(result => result.items)
       );
+
+  }
+
+  onPageChange(page: number): void {
+
+    this.pageNumber = page;
+
+    this.reload$.next();
+
+  }
+
+
+  onPageSizeChange(size: number): void {
+
+    this.pageSize = size;
+    this.pageNumber = 1;
+
+    this.reload$.next();
 
   }
 

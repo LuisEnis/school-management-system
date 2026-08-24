@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SchoolManagement.API.Data;
+using SchoolManagement.API.DTOs.Common;
 using SchoolManagement.API.Entities;
 using SchoolManagement.API.Interfaces.Repositories;
 
@@ -14,7 +15,33 @@ namespace SchoolManagement.API.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Subject>> GetAllAsync()
+        public async Task<PagedResult<Subject>> GetAllAsync(PaginationRequest request)
+        {
+            var query = _context.Subjects
+                .OrderBy(s => s.Id);
+
+            var totalCount = await query.CountAsync();
+
+            var subjects = await query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            return new PagedResult<Subject>
+            {
+                Items = subjects,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalCount = totalCount
+            };
+        }
+
+        public async Task<int> CountAsync()
+        {
+            return await _context.Subjects.CountAsync();
+        }
+
+        public async Task<IEnumerable<Subject>> GetAllUnpagedAsync()
         {
             return await _context.Subjects
                 .ToListAsync();

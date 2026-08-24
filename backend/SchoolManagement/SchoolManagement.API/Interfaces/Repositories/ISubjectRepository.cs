@@ -1,10 +1,15 @@
-﻿using SchoolManagement.API.Entities;
+﻿using SchoolManagement.API.DTOs.Common;
+using SchoolManagement.API.Entities;
 
 namespace SchoolManagement.API.Interfaces.Repositories
 {
     public interface ISubjectRepository
     {
-        Task<IEnumerable<Subject>> GetAllAsync();
+        Task<PagedResult<Subject>> GetAllAsync(PaginationRequest request);
+
+        Task<int> CountAsync();
+
+        Task<IEnumerable<Subject>> GetAllUnpagedAsync();
 
         Task<Subject?> GetByIdAsync(int id);
 

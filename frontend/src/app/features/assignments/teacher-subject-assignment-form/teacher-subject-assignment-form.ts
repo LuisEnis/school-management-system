@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
  FormBuilder,
@@ -15,6 +15,7 @@ import { AssignmentService } from '../../../core/services/assignment.service';
 
 import { UserDto } from '../../../core/models/users/user.dto';
 import { Subject } from '../../../core/models/subjects/subject.model';
+import { forkJoin } from 'rxjs';
 
 
 @Component({
@@ -43,7 +44,8 @@ private fb:FormBuilder,
 private userService:UserService,
 private subjectService:SubjectService,
 private assignmentService:AssignmentService,
-private router:Router
+private router:Router,
+private cdr:ChangeDetectorRef
 ){}
 
 
@@ -65,19 +67,42 @@ this.form=this.fb.group({
 
 });
 
-
-this.userService
-.getTeachers()
-.subscribe(x=>this.teachers=x);
-
-
-this.subjectService
-.getAll()
-.subscribe(x=>this.subjects=x);
-
+this.loadData();
 
 }
 
+
+loadData(): void {
+
+  forkJoin({
+
+    teachers: this.userService.getAllTeachers(),
+
+    subjects: this.subjectService.getAllSubjects()
+
+  }).subscribe({
+
+    next: data => {
+
+      this.teachers = data.teachers;
+      this.subjects = data.subjects;
+
+      this.cdr.detectChanges();
+
+    },
+
+    error: error => {
+
+      console.error(
+        'Failed loading assignment data',
+        error
+      );
+
+    }
+
+  });
+
+}
 
 
 save():void{

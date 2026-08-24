@@ -4,7 +4,9 @@ import { RouterLink } from '@angular/router';
 
 import { UserService } from '../../../core/services/user.service';
 import { UserDto } from '../../../core/models/users/user.dto';
-import { Observable, startWith, Subject, switchMap } from 'rxjs';
+import { map, Observable, startWith, Subject, switchMap, tap } from 'rxjs';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination';
+import { PagedResult } from '../../../core/models/common/paged-result.model';
 
 
 @Component({
@@ -12,7 +14,8 @@ import { Observable, startWith, Subject, switchMap } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink
+    RouterLink,
+    PaginationComponent
   ],
   templateUrl: './student-list.html',
   styleUrl: './student-list.css'
@@ -21,6 +24,10 @@ export class StudentList implements OnInit {
 
   private reload$ = new Subject<void>();
   students$!: Observable<UserDto[]>;
+  pageNumber = 1;
+  pageSize = 15;
+  totalPages = 0;
+  totalCount = 0;
 
 
   constructor(
@@ -35,9 +42,35 @@ export class StudentList implements OnInit {
               .pipe(
                   startWith(null),
                   switchMap(() =>
-                      this.userService.getStudents()
-                  )
+                      this.userService.getStudents(this.pageNumber, this.pageSize)
+                  ),
+                  tap((result: PagedResult<UserDto>) => {
+
+                    this.totalPages = result.totalPages;
+                    this.totalCount = result.totalCount;
+
+                  }),
+
+                  map(result => result.items)
               );
+
+  }
+
+  onPageChange(page: number): void {
+
+    this.pageNumber = page;
+
+    this.reload$.next();
+
+  }
+
+
+  onPageSizeChange(size: number): void {
+
+    this.pageSize = size;
+    this.pageNumber = 1;
+
+    this.reload$.next();
 
   }
 
@@ -74,6 +107,3 @@ export class StudentList implements OnInit {
 
 }
 
-function startWIth(arg0: null): import("rxjs").OperatorFunction<void, unknown> {
-  throw new Error('Function not implemented.');
-}

@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
-import { Observable, startWith, Subject, switchMap } from 'rxjs';
+import { map, Observable, startWith, Subject, switchMap, tap } from 'rxjs';
 
 import { UserService } from '../../../core/services/user.service';
 import { UserDto } from '../../../core/models/users/user.dto';
 import { AuthService } from '../../../core/services/auth.service';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination';
+import { PagedResult } from '../../../core/models/common/paged-result.model';
 
 
 @Component({
@@ -14,7 +16,8 @@ import { AuthService } from '../../../core/services/auth.service';
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink
+    RouterLink,
+    PaginationComponent
   ],
   templateUrl: './secretary-list.html',
   styleUrl: './secretary-list.css'
@@ -24,6 +27,10 @@ export class SecretaryList implements OnInit {
   private reload$ = new Subject<void>();
 
   secretaries$!: Observable<UserDto[]>;
+  pageNumber = 1;
+  pageSize = 15;
+  totalPages = 0;
+  totalCount = 0;
 
 
   constructor(
@@ -39,11 +46,34 @@ export class SecretaryList implements OnInit {
         .pipe(
           startWith(null),
           switchMap(() =>
-            this.userService.getSecretaries()
-          )
+            this.userService.getSecretaries(this.pageNumber, this.pageSize)
+          ),
+          tap((result: PagedResult<UserDto>) => {
+            this.totalPages = result.totalPages;
+            this.totalCount = result.totalCount;
+          }),
+          map(result => result.items)
         );
 
   }
+
+onPageChange(page: number): void {
+
+  this.pageNumber = page;
+
+  this.reload$.next();
+
+}
+
+
+onPageSizeChange(size: number): void {
+
+  this.pageSize = size;
+  this.pageNumber = 1;
+
+  this.reload$.next();
+
+}
 
 
   delete(id: number): void {

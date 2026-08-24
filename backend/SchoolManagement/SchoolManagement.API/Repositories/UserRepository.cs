@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SchoolManagement.API.Data;
+using SchoolManagement.API.DTOs.Common;
 using SchoolManagement.API.Entities;
 using SchoolManagement.API.Enums;
 using SchoolManagement.API.Interfaces.Repositories;
@@ -15,17 +16,61 @@ namespace SchoolManagement.API.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync()
+        public async Task<PagedResult<User>> GetAllAsync(PaginationRequest request)
         {
-            return await _context.Users
+            var query = _context.Users
+                .OrderBy(u => u.Id);
+
+            var totalCount = await query.CountAsync();
+
+            var users = await query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
                 .ToListAsync();
+
+            return new PagedResult<User>
+            {
+                Items = users,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalCount = totalCount
+            };
         }
 
-        public async Task<IEnumerable<User>> GetByRoleAsync(UserRole role)
+        public async Task<PagedResult<User>> GetByRoleAsync(UserRole role, PaginationRequest request)
+        {
+            var query = _context.Users
+                .Where(u => u.Role == role)
+                .OrderBy(u => u.Id);
+
+            var totalCount = await query.CountAsync();
+
+            var users = await query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            return new PagedResult<User>
+            {
+                Items = users,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalCount = totalCount
+            };
+        }
+
+        public async Task<IEnumerable<User>> GetAllByRoleAsync(UserRole role)
         {
             return await _context.Users
                 .Where(u => u.Role == role)
+                .OrderBy(u => u.Id)
                 .ToListAsync();
+        }
+
+        public async Task<int> CountByRoleAsync(UserRole role)
+        {
+            return await _context.Users
+                .CountAsync(u => u.Role == role);
         }
 
         public async Task<User?> GetByIdAsync(int id)

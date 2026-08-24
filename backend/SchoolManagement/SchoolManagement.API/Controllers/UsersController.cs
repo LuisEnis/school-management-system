@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SchoolManagement.API.DTOs.Common;
 using SchoolManagement.API.DTOs.Users;
 using SchoolManagement.API.Enums;
 using SchoolManagement.API.Exceptions;
@@ -24,9 +25,9 @@ namespace SchoolManagement.API.Controllers
         /// </summary>
         [HttpGet]
         [Authorize(Policy = "Management")]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
+        public async Task<ActionResult<PagedResult<UserDto>>> GetAllUsers([FromQuery] PaginationRequest request)
         {
-            var users = await _userService.GetAllAsync();
+            var users = await _userService.GetAllAsync(request);
 
             return Ok(users);
         }
@@ -51,9 +52,21 @@ namespace SchoolManagement.API.Controllers
         /// </summary>
         [HttpGet("students")]
         [Authorize(Policy = "Management")]
+        public async Task<ActionResult<PagedResult<UserDto>>> GetStudents([FromQuery] PaginationRequest request)
+        {
+            var users = await _userService.GetByRoleAsync(UserRole.Student, request);
+
+            return Ok(users);
+        }
+
+        /// <summary>
+        /// Gets all the students.
+        /// </summary>
+        [HttpGet("students/all")]
+        [Authorize(Policy = "Management")]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetStudents()
         {
-            var users = await _userService.GetByRoleAsync(UserRole.Student);
+            var users = await _userService.GetAllByRoleAsync(UserRole.Student);
 
             return Ok(users);
         }
@@ -63,9 +76,21 @@ namespace SchoolManagement.API.Controllers
         /// </summary>
         [HttpGet("teachers")]
         [Authorize(Policy = "Management")]
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetTeachers([FromQuery] PaginationRequest request)
+        {
+            var users = await _userService.GetByRoleAsync(UserRole.Teacher, request);
+
+            return Ok(users);
+        }
+
+        /// <summary>
+        /// Gets all the teachers.
+        /// </summary>
+        [HttpGet("teachers/all")]
+        [Authorize(Policy = "Management")]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetTeachers()
         {
-            var users = await _userService.GetByRoleAsync(UserRole.Teacher);
+            var users = await _userService.GetAllByRoleAsync(UserRole.Teacher);
 
             return Ok(users);
         }
@@ -75,11 +100,10 @@ namespace SchoolManagement.API.Controllers
         /// </summary>
         [HttpGet("secretaries")]
         [Authorize(Policy = "DirectorOnly")]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetSecretaries()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetSecretaries([FromQuery] PaginationRequest request)
         {
             var users =
-                await _userService
-                    .GetByRoleAsync(UserRole.Secretary);
+                await _userService.GetByRoleAsync(UserRole.Secretary, request);
 
             return Ok(users);
         }

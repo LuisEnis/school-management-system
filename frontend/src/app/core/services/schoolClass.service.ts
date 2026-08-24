@@ -8,6 +8,7 @@ import { SchoolClass } from '../models/schoolClasses/school-class.model';
 import { CreateSchoolClassDto } from '../models/schoolClasses/create-school-class.dto';
 import { UpdateSchoolClassDto } from '../models/schoolClasses/update-school-class.dto';
 import { ClassDetailsDto } from '../models/schoolClasses/class-details.dto';
+import { PagedResult } from '../models/common/paged-result.model';
 
 
 @Injectable({
@@ -26,10 +27,20 @@ constructor(
 
 
 
-getClasses():Observable<SchoolClass[]>{
+getClasses(
+  pageNumber: number = 1,
+  pageSize: number = 15
+): Observable<PagedResult<SchoolClass>> {
+
+  return this.http.get<PagedResult<SchoolClass>>(
+    `${this.apiUrl}?pageNumber=${pageNumber}&pageSize=${pageSize}`
+  );
+}
+
+getAllClasses():Observable<SchoolClass[]>{
 
  return this.http.get<SchoolClass[]>(
-  this.apiUrl
+  `${this.apiUrl}/all`
  );
 
 }

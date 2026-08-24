@@ -4,7 +4,9 @@ import { RouterLink } from '@angular/router';
 
 import { SchoolClass } from '../../../core/models/schoolClasses/school-class.model';
 import { SchoolClassService } from '../../../core/services/schoolClass.service';
-import { Observable, startWith, Subject, switchMap } from 'rxjs';
+import { map, Observable, shareReplay, startWith, Subject, switchMap, tap } from 'rxjs';
+import { PagedResult } from '../../../core/models/common/paged-result.model';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination';
 
 
 @Component({
@@ -12,7 +14,8 @@ import { Observable, startWith, Subject, switchMap } from 'rxjs';
   standalone:true,
   imports:[
     CommonModule,
-    RouterLink
+    RouterLink,
+    PaginationComponent
   ],
   templateUrl:'./school-cLass-list.html',
   styleUrl:'./school-class-list.css'
@@ -21,6 +24,10 @@ export class SchoolClassList implements OnInit {
 
   private reload$ = new Subject<void>();
   schoolClasses$!: Observable<SchoolClass[]>;
+  pageNumber = 1;
+  pageSize = 15;
+  totalPages = 0;
+  totalCount = 0;
 
 
 
@@ -37,34 +44,59 @@ export class SchoolClassList implements OnInit {
         .pipe(
             startWith(null),
             switchMap(() =>
-                this.schoolClassService.getClasses()
-            )
+              this.schoolClassService.getClasses(this.pageNumber, this.pageSize)
+            ),
+            tap((result: PagedResult<SchoolClass>) => {
+
+            this.totalPages = result.totalPages;
+            this.totalCount = result.totalCount;
+
+          }),
+          map(result =>
+            result.items
+          ),
+
+          shareReplay(1)
         );
 
   }
 
+  onPageChange(page: number): void {
 
-  delete(id:number):void{
+    this.pageNumber = page;
+
+    this.reload$.next();
+
+  }
 
 
-    if(!confirm(
-      'Delete this class?'
-    ))
+  onPageSizeChange(size: number): void {
+
+    this.pageSize = size;
+    this.pageNumber = 1;
+
+    this.reload$.next();
+
+  }
+
+
+  delete(id: number): void {
+
+    if (!confirm('Delete this class?'))
       return;
-
 
 
     this.schoolClassService
       .delete(id)
       .subscribe({
 
-        next:()=>{
+        next: () => {
 
           this.reload$.next();
 
         },
 
-        error:error=>{
+        error: error => {
 
           console.error(
             'Failed deleting class',

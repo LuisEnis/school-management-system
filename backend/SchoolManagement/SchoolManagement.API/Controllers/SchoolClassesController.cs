@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SchoolManagement.API.DTOs.Common;
 using SchoolManagement.API.DTOs.SchoolClasses;
 using SchoolManagement.API.Entities;
 using SchoolManagement.API.Enums;
@@ -25,9 +26,21 @@ namespace SchoolManagement.API.Controllers
         /// </summary>
         [HttpGet]
         [Authorize(Policy = "Management")]
-        public async Task<ActionResult<IEnumerable<SchoolClassDto>>> GetAll()
+        public async Task<ActionResult<PagedResult<SchoolClassDto>>> GetAll([FromQuery] PaginationRequest request)
         {
-            var classes = await _schoolClassService.GetAllAsync();
+            var classes = await _schoolClassService.GetAllAsync(request);
+
+            return Ok(classes);
+        }
+
+        /// <summary>
+        /// Gets all the classes.
+        /// </summary>
+        [HttpGet("all")]
+        [Authorize(Policy = "Management")]
+        public async Task<ActionResult<IEnumerable<SchoolClassDto>>> GetAllUnpaged()
+        {
+            var classes = await _schoolClassService.GetAllUnpagedAsync();
 
             return Ok(classes);
         }

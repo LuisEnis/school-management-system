@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -14,6 +14,7 @@ import { AssignmentService } from '../../../core/services/assignment.service';
 
 import { UserDto } from '../../../core/models/users/user.dto';
 import { SchoolClass } from '../../../core/models/schoolClasses/school-class.model';
+import { forkJoin } from 'rxjs';
 
 
 @Component({
@@ -41,7 +42,8 @@ constructor(
  private userService:UserService,
  private schoolClassService:SchoolClassService,
  private assignmentService:AssignmentService,
- private router:Router
+ private router:Router,
+ private cdr: ChangeDetectorRef
 ){}
 
 
@@ -70,27 +72,35 @@ ngOnInit():void{
 
 
 
-loadData():void{
+loadData(): void {
 
+  forkJoin({
 
- this.userService
- .getStudents()
- .subscribe(data=>{
+    students: this.userService.getAllStudents(),
 
-  this.students=data;
+    classes: this.schoolClassService.getAllClasses()
 
- });
+  }).subscribe({
 
+    next: data => {
 
+      this.students = data.students;
+      this.classes = data.classes;
 
- this.schoolClassService
- .getClasses()
- .subscribe(data=>{
+      this.cdr.detectChanges();
 
-  this.classes=data;
+    },
 
- });
+    error: error => {
 
+      console.error(
+        'Failed loading assignment data',
+        error
+      );
+
+    }
+
+  });
 
 }
 
