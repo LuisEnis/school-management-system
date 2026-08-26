@@ -22,7 +22,7 @@ namespace SchoolManagement.API.Controllers
         /// Retrieves all subjects.
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<PagedResult<SubjectDto>>> GetAll([FromQuery] PaginationRequest request)
+        public async Task<ActionResult<PagedResult<SubjectDto>>> GetAll([FromQuery] SubjectQueryRequest request)
         {
             var subjects = await _subjectService.GetAllAsync(request);
 

@@ -28,7 +28,7 @@ namespace SchoolManagement.API.Services
             _mapper = mapper;
         }
 
-        public async Task<PagedResult<UserDto>> GetAllAsync(PaginationRequest request)
+        public async Task<PagedResult<UserDto>> GetAllAsync(UserQueryRequest request)
         {
             var result = await _userRepository.GetAllAsync(request);
 
@@ -41,7 +41,7 @@ namespace SchoolManagement.API.Services
             };
         }
 
-        public async Task<PagedResult<UserDto>> GetByRoleAsync(UserRole role, PaginationRequest request)
+        public async Task<PagedResult<UserDto>> GetByRoleAsync(UserRole role, UserQueryRequest request)
         {
             var result = await _userRepository
                 .GetByRoleAsync(role, request);

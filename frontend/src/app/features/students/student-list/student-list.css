@@ -1,72 +1,248 @@
-/* header layout */
+/* Header */
+
 .page-header {
+
   display: flex;
+
   justify-content: space-between;
+
   align-items: center;
+
   margin-bottom: 15px;
+
 }
 
-/* add button */
+
+/* Add button */
+
 .add-btn {
+
   background-color: #1e40af;
+
   color: white;
+
   border: none;
+
   padding: 8px 14px;
+
   border-radius: 6px;
+
   cursor: pointer;
+
 }
 
 .add-btn:hover {
+
   background-color: #1d4ed8;
+
 }
 
-/* table improvements */
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
+
+/* Search */
+
+.search-container {
+
+  margin-bottom: 15px;
+
 }
+
+
+.search-input {
+
+  width: 100%;
+
+  max-width: 400px;
+
+  padding: 10px 12px;
+
+  border: 1px solid #ccc;
+
+  border-radius: 6px;
+
+  font-size: 14px;
+
+  box-sizing: border-box;
+
+}
+
+
+.search-input:focus {
+
+  outline: none;
+
+  border-color: #1e40af;
+
+  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.1);
+
+}
+
+
+/* Table */
+
+.table {
+
+  width: 100%;
+
+  border-collapse: collapse;
+
+  background: white;
+
+}
+
 
 th {
+
   background-color: #1e293b;
+
   color: white;
+
   padding: 10px;
+
   text-align: left;
+
 }
+
 
 td {
+
   padding: 10px;
+
   border-bottom: 1px solid #e5e7eb;
+
 }
 
-/* action buttons */
-.actions {
-  display: flex;
-  gap: 8px;
+
+/* Sortable headers */
+
+th.sortable {
+
+  cursor: pointer;
+
+  user-select: none;
+
 }
+
+
+th.sortable:hover {
+
+  background-color: #334155;
+
+}
+
+
+.sort-icon {
+
+  display: inline-block;
+
+  margin-left: 6px;
+
+  font-size: 13px;
+
+  opacity: 0.8;
+
+}
+
+
+/* Action buttons */
+
+.actions {
+
+  display: flex;
+
+  gap: 8px;
+
+}
+
 
 .edit-btn {
+
   background-color: #f59e0b;
+
   color: white;
+
   border: none;
+
   padding: 6px 10px;
+
   border-radius: 5px;
+
   cursor: pointer;
+
 }
+
 
 .delete-btn {
+
   background-color: #ef4444;
+
   color: white;
+
   border: none;
+
   padding: 6px 10px;
+
   border-radius: 5px;
+
   cursor: pointer;
+
 }
+
 
 .edit-btn:hover {
+
   background-color: #d97706;
+
 }
 
+
 .delete-btn:hover {
+
   background-color: #dc2626;
+
+}
+
+
+/* Mobile */
+
+@media (max-width: 700px) {
+
+  .page-header {
+
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 10px;
+
+  }
+
+
+  .add-btn {
+
+    width: 100%;
+
+  }
+
+
+  .search-input {
+
+    max-width: none;
+
+  }
+
+
+  .table {
+
+    font-size: 13px;
+
+  }
+
+
+  th,
+  td {
+
+    padding: 8px;
+
+  }
+
 }

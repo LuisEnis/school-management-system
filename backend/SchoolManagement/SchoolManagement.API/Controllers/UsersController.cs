@@ -25,7 +25,7 @@ namespace SchoolManagement.API.Controllers
         /// </summary>
         [HttpGet]
         [Authorize(Policy = "Management")]
-        public async Task<ActionResult<PagedResult<UserDto>>> GetAllUsers([FromQuery] PaginationRequest request)
+        public async Task<ActionResult<PagedResult<UserDto>>> GetAllUsers([FromQuery] UserQueryRequest request)
         {
             var users = await _userService.GetAllAsync(request);
 
@@ -52,7 +52,7 @@ namespace SchoolManagement.API.Controllers
         /// </summary>
         [HttpGet("students")]
         [Authorize(Policy = "Management")]
-        public async Task<ActionResult<PagedResult<UserDto>>> GetStudents([FromQuery] PaginationRequest request)
+        public async Task<ActionResult<PagedResult<UserDto>>> GetStudents([FromQuery] UserQueryRequest request)
         {
             var users = await _userService.GetByRoleAsync(UserRole.Student, request);
 
@@ -64,7 +64,7 @@ namespace SchoolManagement.API.Controllers
         /// </summary>
         [HttpGet("students/all")]
         [Authorize(Policy = "Management")]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetStudents()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetStudentsUnpaged()
         {
             var users = await _userService.GetAllByRoleAsync(UserRole.Student);
 
@@ -76,7 +76,7 @@ namespace SchoolManagement.API.Controllers
         /// </summary>
         [HttpGet("teachers")]
         [Authorize(Policy = "Management")]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetTeachers([FromQuery] PaginationRequest request)
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetTeachers([FromQuery] UserQueryRequest request)
         {
             var users = await _userService.GetByRoleAsync(UserRole.Teacher, request);
 
@@ -88,7 +88,7 @@ namespace SchoolManagement.API.Controllers
         /// </summary>
         [HttpGet("teachers/all")]
         [Authorize(Policy = "Management")]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetTeachers()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetTeachersUnpaged()
         {
             var users = await _userService.GetAllByRoleAsync(UserRole.Teacher);
 
@@ -100,7 +100,7 @@ namespace SchoolManagement.API.Controllers
         /// </summary>
         [HttpGet("secretaries")]
         [Authorize(Policy = "DirectorOnly")]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetSecretaries([FromQuery] PaginationRequest request)
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetSecretaries([FromQuery] UserQueryRequest request)
         {
             var users =
                 await _userService.GetByRoleAsync(UserRole.Secretary, request);

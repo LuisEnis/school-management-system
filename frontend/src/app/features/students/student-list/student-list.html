@@ -6,11 +6,31 @@
   </button>
 </div>
 
+<div class="search-container">
+
+  <input type="text" class="search-input" placeholder="Search students..." [value]="search" (input)="onSearch($event)">
+
+</div>
+
 <table class="table">
   <thead>
     <tr>
-      <th>Full Name</th>
-      <th>Email</th>
+      <th class="sortable" (click)="onSort('fullname')">
+        
+        Full Name
+        
+        <span class="sort-icon">
+          {{ getSortIcon('fullname') }}
+        </span>
+      </th>
+      <th class="sortable" (click)="onSort('email')">
+        
+        Email
+
+        <span class="sort-icon">
+          {{ getSortIcon('email') }}
+        </span>
+      </th>
       <th>Actions</th>
     </tr>
   </thead>

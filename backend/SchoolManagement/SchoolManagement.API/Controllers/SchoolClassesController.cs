@@ -26,7 +26,7 @@ namespace SchoolManagement.API.Controllers
         /// </summary>
         [HttpGet]
         [Authorize(Policy = "Management")]
-        public async Task<ActionResult<PagedResult<SchoolClassDto>>> GetAll([FromQuery] PaginationRequest request)
+        public async Task<ActionResult<PagedResult<SchoolClassDto>>> GetAll([FromQuery] SchoolClassQueryRequest request)
         {
             var classes = await _schoolClassService.GetAllAsync(request);
 

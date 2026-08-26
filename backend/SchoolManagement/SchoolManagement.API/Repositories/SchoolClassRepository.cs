@@ -15,10 +15,21 @@ namespace SchoolManagement.API.Repositories
             _context = context;
         }
 
-        public async Task<PagedResult<SchoolClass>> GetAllAsync(PaginationRequest request)
+        public async Task<PagedResult<SchoolClass>> GetAllAsync(SchoolClassQueryRequest request)
         {
-            var query = _context.SchoolClasses
-                .OrderBy(c => c.Id);
+            var query = _context.SchoolClasses.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(request.Search))
+            {
+                var search = request.Search.Trim();
+
+                query = query.Where(s =>
+                    s.Name.Contains(search));
+            }
+
+            query = request.SortDescending
+                ? query.OrderByDescending(s => s.Name)
+                : query.OrderBy(s => s.Name);
 
             var totalCount = await query.CountAsync();
 

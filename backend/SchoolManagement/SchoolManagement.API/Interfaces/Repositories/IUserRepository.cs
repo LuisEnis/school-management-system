@@ -7,9 +7,9 @@ namespace SchoolManagement.API.Interfaces.Repositories
 {
     public interface IUserRepository
     {
-        Task<PagedResult<User>> GetAllAsync(PaginationRequest request);
+        Task<PagedResult<User>> GetAllAsync(UserQueryRequest request);
 
-        Task<PagedResult<User>> GetByRoleAsync(UserRole role, PaginationRequest request);
+        Task<PagedResult<User>> GetByRoleAsync(UserRole role, UserQueryRequest request);
 
         Task<IEnumerable<User>> GetAllByRoleAsync(UserRole role);
 

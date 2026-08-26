@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 
 import { UserService } from '../../../core/services/user.service';
 import { UserDto } from '../../../core/models/users/user.dto';
-import { map, Observable, startWith, Subject, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, Observable, startWith, Subject, switchMap, tap } from 'rxjs';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination';
 import { PagedResult } from '../../../core/models/common/paged-result.model';
 
@@ -23,11 +23,15 @@ import { PagedResult } from '../../../core/models/common/paged-result.model';
 export class StudentList implements OnInit {
 
   private reload$ = new Subject<void>();
+  private search$ = new Subject<string>();
   students$!: Observable<UserDto[]>;
   pageNumber = 1;
   pageSize = 15;
   totalPages = 0;
   totalCount = 0;
+  search = '';
+  sortBy = '';
+  sortDescending = false;
 
 
   constructor(
@@ -37,12 +41,26 @@ export class StudentList implements OnInit {
 
   ngOnInit(): void {
 
+    this.search$
+      .pipe(
+        debounceTime(400),
+        distinctUntilChanged()
+      )
+      .subscribe(search => {
+
+        this.search = search;
+        this.pageNumber = 1;
+
+        this.reload$.next();
+
+      });
+
       this.students$ =
               this.reload$
               .pipe(
                   startWith(null),
                   switchMap(() =>
-                      this.userService.getStudents(this.pageNumber, this.pageSize)
+                      this.userService.getStudents(this.pageNumber, this.pageSize, this.search, this.sortBy, this.sortDescending)
                   ),
                   tap((result: PagedResult<UserDto>) => {
 
@@ -53,6 +71,47 @@ export class StudentList implements OnInit {
 
                   map(result => result.items)
               );
+
+  }
+
+  onSearch(event: Event): void {
+
+    const input =
+      event.target as HTMLInputElement;
+
+    this.search$.next(input.value);
+
+  }
+
+
+  onSort(column: string): void {
+
+    if (this.sortBy === column) {
+
+      this.sortDescending = !this.sortDescending;
+
+    } else {
+
+      this.sortBy = column;
+      this.sortDescending = false;
+
+    }
+
+    this.pageNumber = 1;
+
+    this.reload$.next();
+
+  }
+
+
+  getSortIcon(column: string): string {
+
+    if (this.sortBy !== column)
+      return '↕';
+
+    return this.sortDescending
+      ? '↓'
+      : '↑';
 
   }
 

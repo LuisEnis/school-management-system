@@ -25,22 +25,22 @@ constructor(
  private http:HttpClient
 ){}
 
-getAll(): Observable<UserDto[]> {
-
-  return this.http.get<UserDto[]>(
-    this.apiUrl
-  );
-
-}
-
 
 getStudents(
   pageNumber: number = 1,
-  pageSize: number = 15
+  pageSize: number = 15,
+  search: string = '',
+  sortBy: string = '',
+  sortDescending: boolean = false
 ): Observable<PagedResult<UserDto>> {
 
   return this.http.get<PagedResult<UserDto>>(
-    `${this.apiUrl}/students?pageNumber=${pageNumber}&pageSize=${pageSize}`
+    `${this.apiUrl}/students` +
+    `?pageNumber=${pageNumber}` +
+    `&pageSize=${pageSize}` +
+    `&search=${encodeURIComponent(search)}` +
+    `&sortBy=${encodeURIComponent(sortBy)}` +
+    `&sortDescending=${sortDescending}`
   );
 
 }
@@ -56,11 +56,19 @@ getAllStudents():Observable<UserDto[]>{
 
 getTeachers(
   pageNumber: number = 1,
-  pageSize: number = 15
+  pageSize: number = 15,
+  search: string = '',
+  sortBy: string = '',
+  sortDescending: boolean = false
 ): Observable<PagedResult<UserDto>> {
 
   return this.http.get<PagedResult<UserDto>>(
-    `${this.apiUrl}/teachers?pageNumber=${pageNumber}&pageSize=${pageSize}`
+    `${this.apiUrl}/teachers` +
+    `?pageNumber=${pageNumber}` +
+    `&pageSize=${pageSize}` +
+    `&search=${encodeURIComponent(search)}` +
+    `&sortBy=${encodeURIComponent(sortBy)}` +
+    `&sortDescending=${sortDescending}`
   );
 
 }
@@ -76,11 +84,19 @@ getAllTeachers():Observable<UserDto[]>{
 
 getSecretaries(
   pageNumber: number = 1,
-  pageSize: number = 15
+  pageSize: number = 15,
+  search: string = '',
+  sortBy: string = '',
+  sortDescending: boolean = false
 ): Observable<PagedResult<UserDto>> {
 
   return this.http.get<PagedResult<UserDto>>(
-    `${this.apiUrl}/secretaries?pageNumber=${pageNumber}&pageSize=${pageSize}`
+    `${this.apiUrl}/secretaries` +
+    `?pageNumber=${pageNumber}` +
+    `&pageSize=${pageSize}` +
+    `&search=${encodeURIComponent(search)}` +
+    `&sortBy=${encodeURIComponent(sortBy)}` +
+    `&sortDescending=${sortDescending}`
   );
 
 }

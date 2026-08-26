@@ -25,11 +25,18 @@ export class SubjectService {
 
   getAll(
     pageNumber: number = 1,
-    pageSize: number = 15
+    pageSize: number = 15,
+    search: string = '',
+    sortBy: string = 'name',
+    sortDescending: boolean = false
   ): Observable<PagedResult<Subject>> {
 
     return this.http.get<PagedResult<Subject>>(
-      `${this.apiUrl}?pageNumber=${pageNumber}&pageSize=${pageSize}`
+      `${this.apiUrl}?pageNumber=${pageNumber}` +
+      `&pageSize=${pageSize}` +
+      `&search=${encodeURIComponent(search)}` +
+      `&sortBy=${sortBy}` +
+      `&sortDescending=${sortDescending}`
     );
 
   }

@@ -29,12 +29,20 @@ constructor(
 
 getClasses(
   pageNumber: number = 1,
-  pageSize: number = 15
+  pageSize: number = 15,
+  search: string = '',
+  sortBy: string = '',
+  sortDescending: boolean = false
 ): Observable<PagedResult<SchoolClass>> {
 
   return this.http.get<PagedResult<SchoolClass>>(
-    `${this.apiUrl}?pageNumber=${pageNumber}&pageSize=${pageSize}`
+    `${this.apiUrl}?pageNumber=${pageNumber}` +
+    `&pageSize=${pageSize}` +
+    `&search=${encodeURIComponent(search)}` +
+    `&sortBy=${encodeURIComponent(sortBy)}` +
+    `&sortDescending=${sortDescending}`
   );
+
 }
 
 getAllClasses():Observable<SchoolClass[]>{

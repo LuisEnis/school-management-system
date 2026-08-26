@@ -25,7 +25,7 @@ namespace SchoolManagement.API.Services
             _mapper = mapper;
         }
 
-        public async Task<PagedResult<SchoolClassDto>> GetAllAsync(PaginationRequest request)
+        public async Task<PagedResult<SchoolClassDto>> GetAllAsync(SchoolClassQueryRequest request)
         {
             var result =
                 await _schoolClassRepository.GetAllAsync(request);

@@ -1,72 +1,193 @@
 /* header layout */
+
 .page-header {
+
   display: flex;
+
   justify-content: space-between;
+
   align-items: center;
+
   margin-bottom: 15px;
+
 }
 
-/* add button */
-.add-btn {
-  background-color: #1e40af;
-  color: white;
-  border: none;
-  padding: 8px 14px;
+
+/* search */
+
+.search-container {
+
+  margin-bottom: 15px;
+
+}
+
+.search-container input {
+
+  width: 100%;
+
+  max-width: 400px;
+
+  padding: 9px 12px;
+
+  border: 1px solid #ccc;
+
   border-radius: 6px;
+
+  font-size: 14px;
+
+  box-sizing: border-box;
+
+}
+
+.search-container input:focus {
+
+  outline: none;
+
+  border-color: #1e40af;
+
+}
+
+
+/* add button */
+
+.add-btn {
+
+  background-color: #1e40af;
+
+  color: white;
+
+  border: none;
+
+  padding: 8px 14px;
+
+  border-radius: 6px;
+
   cursor: pointer;
+
 }
 
 .add-btn:hover {
+
   background-color: #1d4ed8;
+
 }
 
-/* table improvements */
+
+/* table */
+
 .table {
+
   width: 100%;
+
   border-collapse: collapse;
+
   background: white;
+
 }
+
 
 th {
+
   background-color: #1e293b;
+
   color: white;
+
   padding: 10px;
+
   text-align: left;
+
 }
+
+
+/* sortable headers */
+
+.sortable {
+
+  cursor: pointer;
+
+  user-select: none;
+
+}
+
+.sortable:hover {
+
+  background-color: #334155;
+
+}
+
+
+.sortable span {
+
+  margin-left: 6px;
+
+  font-size: 12px;
+
+}
+
 
 td {
+
   padding: 10px;
+
   border-bottom: 1px solid #e5e7eb;
+
 }
+
 
 /* action buttons */
+
 .actions {
+
   display: flex;
+
   gap: 8px;
+
 }
+
 
 .edit-btn {
+
   background-color: #f59e0b;
+
   color: white;
+
   border: none;
+
   padding: 6px 10px;
+
   border-radius: 5px;
+
   cursor: pointer;
+
 }
+
 
 .delete-btn {
+
   background-color: #ef4444;
+
   color: white;
+
   border: none;
+
   padding: 6px 10px;
+
   border-radius: 5px;
+
   cursor: pointer;
+
 }
+
 
 .edit-btn:hover {
+
   background-color: #d97706;
+
 }
 
+
 .delete-btn:hover {
+
   background-color: #dc2626;
+
 }

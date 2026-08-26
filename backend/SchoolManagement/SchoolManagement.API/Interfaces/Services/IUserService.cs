@@ -6,9 +6,9 @@ namespace SchoolManagement.API.Interfaces.Services
 {
     public interface IUserService
     {
-        Task<PagedResult<UserDto>> GetAllAsync(PaginationRequest request);
+        Task<PagedResult<UserDto>> GetAllAsync(UserQueryRequest request);
 
-        Task<PagedResult<UserDto>> GetByRoleAsync(UserRole role, PaginationRequest request);
+        Task<PagedResult<UserDto>> GetByRoleAsync(UserRole role, UserQueryRequest request);
 
         Task<IEnumerable<UserDto>> GetAllByRoleAsync(UserRole role);
 

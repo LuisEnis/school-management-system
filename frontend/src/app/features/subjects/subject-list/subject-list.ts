@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { SubjectService } from '../../../core/services/subject.service';
 import { Subject as SubjectModel } from '../../../core/models/subjects/subject.model';
 import { Component, OnInit } from '@angular/core';
-import { map, Observable, startWith, Subject, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, Observable, startWith, Subject, switchMap, tap } from 'rxjs';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination';
 import { PagedResult } from '../../../core/models/common/paged-result.model';
 
@@ -22,11 +22,15 @@ import { PagedResult } from '../../../core/models/common/paged-result.model';
 export class SubjectList implements OnInit {
 
   private reload$ = new Subject<void>();
+  private search$ = new Subject<string>();
   subjects$!: Observable<SubjectModel[]>;
   pageNumber = 1;
   pageSize = 15;
   totalPages = 0;
   totalCount = 0;
+  searchTerm = '';
+  sortBy = 'name';
+  sortDescending = false;
 
 
   constructor(
@@ -37,12 +41,26 @@ export class SubjectList implements OnInit {
 
   ngOnInit(): void {
 
+    this.search$
+    .pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    )
+    .subscribe(search => {
+
+      this.searchTerm = search;
+      this.pageNumber = 1;
+
+      this.reload$.next();
+
+    });
+
     this.subjects$ = 
       this.reload$
       .pipe(
         startWith(null),
           switchMap(() =>
-          this.subjectService.getAll(this.pageNumber, this.pageSize)
+          this.subjectService.getAll(this.pageNumber, this.pageSize, this.searchTerm, this.sortBy, this.sortDescending)
         ),
         tap((result: PagedResult<SubjectModel>) => {
           this.totalPages = result.totalPages;
@@ -50,6 +68,44 @@ export class SubjectList implements OnInit {
         }),
         map(result => result.items)
       );
+
+  }
+
+  onSearch(search: string): void {
+
+    this.search$.next(search);
+
+  }
+
+
+  onSort(column: string): void {
+
+    if (this.sortBy === column) {
+
+      this.sortDescending = !this.sortDescending;
+
+    } else {
+
+      this.sortBy = column;
+      this.sortDescending = false;
+
+    }
+
+    this.pageNumber = 1;
+
+    this.reload$.next();
+
+  }
+
+
+  getSortIcon(column: string): string {
+
+    if (this.sortBy !== column)
+      return '↕';
+
+    return this.sortDescending
+      ? '↓'
+      : '↑';
 
   }
 
@@ -104,6 +160,3 @@ export class SubjectList implements OnInit {
 
 }
 
-function startWIth(arg0: null): import("rxjs").OperatorFunction<void, unknown> {
-  throw new Error('Function not implemented.');
-}

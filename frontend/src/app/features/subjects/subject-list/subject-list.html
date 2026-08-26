@@ -6,10 +6,29 @@
   </button>
 </div>
 
+<div class="search-container">
+
+  <input
+    type="text"
+    placeholder="Search subjects..."
+    #searchInput
+    (input)="onSearch(searchInput.value)"
+  />
+
+</div>
+
 <table class="table">
   <thead>
     <tr>
-      <th>Name</th>
+      <th class="sortable" (click)="onSort('name')">
+        
+        Name
+
+        <span class="sort-icon">
+          {{ getSortIcon('name') }}
+        </span>
+
+      </th>
       <th>Actions</th>
     </tr>
   </thead>

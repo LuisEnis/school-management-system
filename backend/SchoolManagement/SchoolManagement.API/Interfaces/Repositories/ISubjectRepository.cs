@@ -5,7 +5,7 @@ namespace SchoolManagement.API.Interfaces.Repositories
 {
     public interface ISubjectRepository
     {
-        Task<PagedResult<Subject>> GetAllAsync(PaginationRequest request);
+        Task<PagedResult<Subject>> GetAllAsync(SubjectQueryRequest request);
 
         Task<int> CountAsync();
 

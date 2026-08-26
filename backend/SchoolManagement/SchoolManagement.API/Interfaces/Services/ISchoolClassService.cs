@@ -5,7 +5,7 @@ namespace SchoolManagement.API.Interfaces.Services
 {
     public interface ISchoolClassService
     {
-        Task<PagedResult<SchoolClassDto>> GetAllAsync(PaginationRequest request);
+        Task<PagedResult<SchoolClassDto>> GetAllAsync(SchoolClassQueryRequest request);
 
         Task<IEnumerable<SchoolClassDto>> GetAllUnpagedAsync();
 
