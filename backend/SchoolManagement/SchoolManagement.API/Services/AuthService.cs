@@ -13,18 +13,21 @@ namespace SchoolManagement.API.Services
         private readonly IPasswordHasherService _passwordHasherService;
         private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
+        private readonly ILogger<AuthService> _logger;
 
 
         public AuthService(
             IUserRepository userRepository,
             IPasswordHasherService passwordHasherService,
             IJwtService jwtService,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<AuthService> logger)
         {
             _userRepository = userRepository;
             _passwordHasherService = passwordHasherService;
             _jwtService = jwtService;
             _mapper = mapper;
+            _logger = logger;
         }
 
 
@@ -37,6 +40,8 @@ namespace SchoolManagement.API.Services
 
             if (user == null)
             {
+                _logger.LogWarning("Failed login attempt for email {Email}.", dto.Email);
+
                 throw new UnauthorizedException(
                     "Invalid email or password.");
             }
@@ -52,9 +57,12 @@ namespace SchoolManagement.API.Services
 
             if (!passwordValid)
             {
+                _logger.LogWarning("Failed login attempt for email {Email}. Password is not valid.", dto.Email);
                 throw new UnauthorizedException(
                     "Invalid email or password.");
             }
+
+            _logger.LogInformation("User {UserId} ({Email}) logged in successfully.", user.Id, user.Email);
 
 
             var jwt =

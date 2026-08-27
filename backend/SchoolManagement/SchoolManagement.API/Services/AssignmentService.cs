@@ -15,15 +15,17 @@ namespace SchoolManagement.API.Services
         private readonly ISubjectRepository _subjectRepository;
         private readonly ISchoolClassRepository _schoolClassRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<AssignmentService> _logger;
 
 
-        public AssignmentService(IAssignmentRepository assignmentRepository, IUserRepository userRepository, ISubjectRepository subjectRepository, ISchoolClassRepository schoolClassRepository, IMapper mapper)
+        public AssignmentService(IAssignmentRepository assignmentRepository, IUserRepository userRepository, ISubjectRepository subjectRepository, ISchoolClassRepository schoolClassRepository, IMapper mapper, ILogger<AssignmentService> logger)
         {
             _assignmentRepository = assignmentRepository;
             _userRepository = userRepository;
             _subjectRepository = subjectRepository;
             _schoolClassRepository = schoolClassRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
 
@@ -74,6 +76,8 @@ namespace SchoolManagement.API.Services
 
             await _assignmentRepository
                 .SaveChangesAsync();
+
+            _logger.LogInformation("Student {StudentId} was assigned to class {ClassId}.", dto.StudentId, dto.SchoolClassId);
 
             return _mapper.Map<StudentClassAssignmentDto>(entity);
         }
@@ -128,6 +132,8 @@ namespace SchoolManagement.API.Services
 
             await _assignmentRepository
                 .SaveChangesAsync();
+
+            _logger.LogInformation("Teacher {TeacherId} was assigned to subject {SubjectId}.", dto.TeacherId, dto.SubjectId);
 
             return _mapper.Map<TeacherSubjectAssignmentDto>(entity);
         }
@@ -210,6 +216,8 @@ namespace SchoolManagement.API.Services
             await _assignmentRepository
                 .SaveChangesAsync();
 
+            _logger.LogInformation("Teacher {TeacherId} was assigned to subject {SubjectId} in class {ClassId}.", dto.TeacherId, dto.SubjectId, dto.SchoolClassId);
+
             return _mapper.Map<TeachingAssignmentDto>(entity);
         }
 
@@ -226,6 +234,8 @@ namespace SchoolManagement.API.Services
             _assignmentRepository.DeleteStudentClass(assignment);
 
             await _assignmentRepository.SaveChangesAsync();
+
+            _logger.LogInformation("Student {studentId} was removed from class {classId}.", studentId, classId);
 
             return true;
         }
@@ -262,6 +272,8 @@ namespace SchoolManagement.API.Services
 
             await _assignmentRepository.SaveChangesAsync();
 
+            _logger.LogInformation("Teacher {teacherId} no longer teaches subject {subjectId}.", teacherId, subjectId);
+
             return true;
         }
 
@@ -281,6 +293,8 @@ namespace SchoolManagement.API.Services
             _assignmentRepository.DeleteTeachingAssignment(assignment);
 
             await _assignmentRepository.SaveChangesAsync();
+
+            _logger.LogInformation("Teacher {teacherId} no longer teaches subject {subjectId} in class {classId}.", teacherId, subjectId, classId);
 
             return true;
         }

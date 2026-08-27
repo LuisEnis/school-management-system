@@ -15,17 +15,20 @@ namespace SchoolManagement.API.Services
         private readonly IAssignmentRepository _assignmentRepository;
         private readonly IPasswordHasherService _passwordHasherService;
         private readonly IMapper _mapper;
+        private readonly ILogger<UserService> _logger;
 
         public UserService(
             IUserRepository userRepository,
             IAssignmentRepository assignmentRepository,
             IPasswordHasherService passwordHasherService,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<UserService> logger)
         {
             _userRepository = userRepository;
             _assignmentRepository = assignmentRepository;
             _passwordHasherService = passwordHasherService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<PagedResult<UserDto>> GetAllAsync(UserQueryRequest request)
@@ -100,6 +103,8 @@ namespace SchoolManagement.API.Services
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
 
+            _logger.LogInformation("User {UserId} ({Email}) was created with role {Role}.", user.Id, user.Email, user.Role);
+
             return _mapper.Map<UserDto>(user);
         }
 
@@ -132,6 +137,8 @@ namespace SchoolManagement.API.Services
             _userRepository.Update(user);
 
             await _userRepository.SaveChangesAsync();
+
+            _logger.LogInformation("User {UserId} ({Email}) was updated.", user.Id, user.Email);
 
             return true;
         }
@@ -183,6 +190,8 @@ namespace SchoolManagement.API.Services
 
             await _userRepository.SaveChangesAsync();
 
+            _logger.LogInformation("User {UserId} ({Email}) was deleted.", user.Id, user.Email);
+
             return true;
         }
 
@@ -210,6 +219,8 @@ namespace SchoolManagement.API.Services
             user.PasswordHash = _passwordHasherService.HashPassword(user, dto.NewPassword);
 
             await _userRepository.SaveChangesAsync();
+
+            _logger.LogInformation("Password changed successfully for user {UserId}.", userId);
         }
     }
 }

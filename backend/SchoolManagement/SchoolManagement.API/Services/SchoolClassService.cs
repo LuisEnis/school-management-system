@@ -14,15 +14,18 @@ namespace SchoolManagement.API.Services
         private readonly ISchoolClassRepository _schoolClassRepository;
         private readonly IAssignmentRepository _assignmentRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<SchoolClassService> _logger;
 
         public SchoolClassService(
             ISchoolClassRepository schoolClassRepository,
             IAssignmentRepository assignmentRepository,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<SchoolClassService> logger)
         {
             _schoolClassRepository = schoolClassRepository;
             _assignmentRepository = assignmentRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<PagedResult<SchoolClassDto>> GetAllAsync(SchoolClassQueryRequest request)
@@ -73,6 +76,8 @@ namespace SchoolManagement.API.Services
             await _schoolClassRepository.AddAsync(schoolClass);
             await _schoolClassRepository.SaveChangesAsync();
 
+            _logger.LogInformation("School class {ClassId} ({ClassName}) was created.", schoolClass.Id, schoolClass.Name);
+
             return _mapper.Map<SchoolClassDto>(schoolClass);
         }
 
@@ -98,6 +103,8 @@ namespace SchoolManagement.API.Services
             _schoolClassRepository.Update(schoolClass);
 
             await _schoolClassRepository.SaveChangesAsync();
+
+            _logger.LogInformation("School class {ClassId} ({ClassName}) was updated.", schoolClass.Id, schoolClass.Name);
 
             return true;
         }
@@ -127,6 +134,8 @@ namespace SchoolManagement.API.Services
             _schoolClassRepository.Delete(schoolClass);
 
             await _schoolClassRepository.SaveChangesAsync();
+
+            _logger.LogInformation("School class {ClassId} ({ClassName}) was deleted.", schoolClass.Id, schoolClass.Name);
 
             return true;
         }

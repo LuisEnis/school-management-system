@@ -14,15 +14,18 @@ namespace SchoolManagement.API.Services
         private readonly ISubjectRepository _subjectRepository;
         private readonly IAssignmentRepository _assignmentRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<SubjectService> _logger;
 
         public SubjectService(
             ISubjectRepository subjectRepository,
             IAssignmentRepository assignmentRepository,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<SubjectService> logger)
         {
             _subjectRepository = subjectRepository;
             _assignmentRepository = assignmentRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<PagedResult<SubjectDto>> GetAllAsync(SubjectQueryRequest request)
@@ -72,6 +75,8 @@ namespace SchoolManagement.API.Services
             await _subjectRepository.AddAsync(subject);
             await _subjectRepository.SaveChangesAsync();
 
+            _logger.LogInformation("Subject {SubjectId} ({SubjectName}) was created.", subject.Id, subject.Name);
+
             return _mapper.Map<SubjectDto>(subject);
         }
 
@@ -97,6 +102,8 @@ namespace SchoolManagement.API.Services
             _subjectRepository.Update(subject);
 
             await _subjectRepository.SaveChangesAsync();
+
+            _logger.LogInformation("Subject {SubjectId} ({SubjectName}) was updated.", subject.Id, subject.Name);
 
             return true;
         }
@@ -127,6 +134,8 @@ namespace SchoolManagement.API.Services
             _subjectRepository.Delete(subject);
 
             await _subjectRepository.SaveChangesAsync();
+
+            _logger.LogInformation("Subject {SubjectId} ({SubjectName}) was deleted.", subject.Id, subject.Name);
 
             return true;
         }
