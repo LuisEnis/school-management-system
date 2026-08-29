@@ -22,7 +22,7 @@ The project is being developed as a practical full-stack application with a focu
 * Custom exception handling middleware
 * Password hashing with ASP.NET Core Identity
 * Automatic database migration and initialization
-* SignalR planned
+* Application logging with ILogger
 
 ### Frontend
 
@@ -360,6 +360,7 @@ The frontend uses Angular standalone components and Reactive Forms.
 ---
 ## 🔄 Current Development Status
 ### Completed
+
 * Backend project architecture
 * Database entities and relationships
 * Entity Framework Core configuration
@@ -369,15 +370,19 @@ The frontend uses Angular standalone components and Reactive Forms.
 * Assignment functionality
 * Business validation
 * Exception handling middleware
+* Application logging with ILogger
 * Password hashing
 * JWT authentication
 * Role-based authorization
 * Swagger/OpenAPI
+* Database-level pagination
+* Filtering and sorting combined with pagination
 * Angular authentication
 * Angular route protection
 * JWT interceptor
 * Student management UI
 * Teacher management UI
+* Secretary management UI
 * Subject management UI
 * Class management UI
 * Assignment management UI
@@ -388,15 +393,32 @@ The frontend uses Angular standalone components and Reactive Forms.
 * Teacher dashboard
 * Director/Secretary management dashboard
 * Teacher class access validation
-* Backend/frontend integration and testing
+* Backend/frontend integration and manual testing
+
 ### Planned / Remaining
-* Final frontend/backend testing and cleanup
-* SignalR integration
-* Additional UI polishing and improvements
+
+* Docker / Docker Compose support
+* SignalR real-time functionality
+* Caching
+* Refresh token authentication
+* Automated backend testing
+* Automated frontend testing
+* CI/CD with GitHub Actions
+* Cloud deployment
+* AI / LLM integration
 ---
 ## 🧪 Testing
-The API has been tested using **Swagger** and **Postman** during development.
-Frontend functionality is tested through the Angular application by verifying:
+The application is currently tested manually during development using **Swagger**, **Postman**, and the Angular application.
+
+Backend testing includes:
+* API endpoint testing
+* Authentication and authorization behavior
+* CRUD operations
+* Business validation
+* Assignment workflows
+* Error handling
+
+Frontend testing includes:
 * Authentication
 * Role-based navigation
 * CRUD operations
@@ -405,6 +427,8 @@ Frontend functionality is tested through the Angular application by verifying:
 * Dashboard data
 * Authorization behavior
 * API integration
+
+Automated backend and frontend testing is planned as a future development phase.
 ---
 ## ⚙️ Running the Project
 ### Backend
@@ -490,18 +514,40 @@ The main goals are:
 * Work with role-based applications
 * Practice API testing with Swagger and Postman
 * Implement automatic database initialization
-* Build a project that can be extended with real-time functionality using SignalR
+* Implement application logging and centralized error handling
+* Containerize the application using Docker
+* Implement real-time communication using SignalR
+* Explore caching and token refresh strategies
+* Implement automated backend and frontend testing
+* Build a CI/CD pipeline using GitHub Actions
+* Deploy the application to the cloud
+* Integrate AI/LLM functionality into the application
 ---
 ## 📌 Future Improvements
-Possible future improvements include:
-* SignalR notifications and real-time updates
-* More detailed management dashboards
-* Attendance management
-* Grades and academic performance
-* Additional reporting
-* Improved error handling and user feedback
-* More extensive automated testing
-* Deployment to a cloud platform
+The next development phases are:
+
+1. **Docker / Docker Compose**
+   * Containerize the application and its supporting services.
+
+2. **SignalR**
+   * Add a useful real-time feature to the application.
+
+3. **Caching & Refresh Tokens**
+   * Evaluate and implement caching where beneficial.
+   * Implement refresh token authentication.
+
+4. **Automated Testing**
+   * Add automated backend tests.
+   * Add automated frontend tests.
+
+5. **CI/CD**
+   * Build a GitHub Actions pipeline for automated build, testing, and deployment workflows.
+
+6. **Cloud Deployment**
+   * Deploy the application to a cloud platform.
+
+7. **AI / LLM Integration**
+   * Add a practical AI-powered feature to the School Management System.
 ---
 ## 👨‍💻 Author
 **Enis Sejdini**
