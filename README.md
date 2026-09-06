@@ -38,6 +38,13 @@ The project is being developed as a practical full-stack application with a focu
 * Role-based route protection
 * Responsive custom CSS
 
+
+### DevOps / Containerization
+
+* Docker
+* Docker Compose
+* Nginx
+
 ---
 
 ## 👥 User Roles
@@ -394,10 +401,10 @@ The frontend uses Angular standalone components and Reactive Forms.
 * Director/Secretary management dashboard
 * Teacher class access validation
 * Backend/frontend integration and manual testing
+* Full-stack Docker / Docker Compose support
 
 ### Planned / Remaining
 
-* Docker / Docker Compose support
 * SignalR real-time functionality
 * Caching
 * Refresh token authentication
@@ -481,6 +488,16 @@ Start the development server:
 ng serve
 ```
 Then open the application in the browser.
+
+### Docker
+
+1. Copy `.env.example` to `.env`.
+2. Configure the required SQL Server password in `.env`.
+3. Run `docker compose up -d --build`.
+4. Open the frontend at `http://localhost:4200`.
+5. Access the API/Swagger at `http://localhost:8080/swagger`.
+6. Stop the containers with `docker compose down`.
+7. To intentionally remove the persisted database volume, use `docker compose down -v`.
 ---
 ## 🔑 Authentication Flow
 The application uses JWT-based authentication.

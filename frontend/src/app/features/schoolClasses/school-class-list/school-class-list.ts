@@ -10,14 +10,14 @@ import { PaginationComponent } from '../../../shared/components/pagination/pagin
 
 
 @Component({
-  selector:'app-schoolClass-list',
+  selector:'app-school-class-list',
   standalone:true,
   imports:[
     CommonModule,
     RouterLink,
     PaginationComponent
   ],
-  templateUrl:'./school-cLass-list.html',
+  templateUrl:'./school-class-list.html',
   styleUrl:'./school-class-list.css'
 })
 export class SchoolClassList implements OnInit {
