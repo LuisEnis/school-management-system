@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
 using SchoolManagement.API.DTOs.Common;
 using SchoolManagement.API.DTOs.Subjects;
 using SchoolManagement.API.Entities;
 using SchoolManagement.API.Exceptions;
+using SchoolManagement.API.Hubs;
 using SchoolManagement.API.Interfaces.Repositories;
 using SchoolManagement.API.Interfaces.Services;
 using SchoolManagement.API.Repositories;
@@ -15,17 +17,20 @@ namespace SchoolManagement.API.Services
         private readonly IAssignmentRepository _assignmentRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<SubjectService> _logger;
+        private readonly IHubContext<SchoolHub> _hubContext;
 
         public SubjectService(
             ISubjectRepository subjectRepository,
             IAssignmentRepository assignmentRepository,
             IMapper mapper,
-            ILogger<SubjectService> logger)
+            ILogger<SubjectService> logger,
+            IHubContext<SchoolHub> hubContext)
         {
             _subjectRepository = subjectRepository;
             _assignmentRepository = assignmentRepository;
             _mapper = mapper;
             _logger = logger;
+            _hubContext = hubContext;
         }
 
         public async Task<PagedResult<SubjectDto>> GetAllAsync(SubjectQueryRequest request)
@@ -77,7 +82,13 @@ namespace SchoolManagement.API.Services
 
             _logger.LogInformation("Subject {SubjectId} ({SubjectName}) was created.", subject.Id, subject.Name);
 
-            return _mapper.Map<SubjectDto>(subject);
+            var subjectDto = _mapper.Map<SubjectDto>(subject);
+
+            await _hubContext.Clients.All.SendAsync(
+                "SubjectCreated",
+                subjectDto);
+
+            return subjectDto;
         }
 
         public async Task<bool> UpdateAsync(int id, UpdateSubjectDto dto)
@@ -105,6 +116,12 @@ namespace SchoolManagement.API.Services
 
             _logger.LogInformation("Subject {SubjectId} ({SubjectName}) was updated.", subject.Id, subject.Name);
 
+            var subjectDto = _mapper.Map<SubjectDto>(subject);
+
+            await _hubContext.Clients.All.SendAsync(
+                "SubjectUpdated",
+                subjectDto);
+
             return true;
         }
 
@@ -122,7 +139,7 @@ namespace SchoolManagement.API.Services
 
             var hasClasses =
                 await _assignmentRepository
-                    .TeacherHasTeachingAssignmentsAsync(id);
+                    .SubjectHasTeachingAssignmentsAsync(id);
 
 
             if (hasTeachers || hasClasses)
@@ -136,6 +153,10 @@ namespace SchoolManagement.API.Services
             await _subjectRepository.SaveChangesAsync();
 
             _logger.LogInformation("Subject {SubjectId} ({SubjectName}) was deleted.", subject.Id, subject.Name);
+
+            await _hubContext.Clients.All.SendAsync(
+                "SubjectDeleted",
+                subject.Id);
 
             return true;
         }

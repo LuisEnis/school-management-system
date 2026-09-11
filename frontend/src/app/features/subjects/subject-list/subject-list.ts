@@ -2,10 +2,11 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { SubjectService } from '../../../core/services/subject.service';
 import { Subject as SubjectModel } from '../../../core/models/subjects/subject.model';
-import { Component, OnInit } from '@angular/core';
-import { debounceTime, distinctUntilChanged, map, Observable, startWith, Subject, switchMap, tap } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { debounceTime, distinctUntilChanged, map, Observable, startWith, Subject, Subscription, switchMap, tap } from 'rxjs';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination';
 import { PagedResult } from '../../../core/models/common/paged-result.model';
+import { SignalRService } from '../../../core/services/signalr.service';
 
 
 @Component({
@@ -19,8 +20,9 @@ import { PagedResult } from '../../../core/models/common/paged-result.model';
   templateUrl: './subject-list.html',
   styleUrl: './subject-list.css'
 })
-export class SubjectList implements OnInit {
+export class SubjectList implements OnInit, OnDestroy  {
 
+  private subscriptions = new Subscription();
   private reload$ = new Subject<void>();
   private search$ = new Subject<string>();
   subjects$!: Observable<SubjectModel[]>;
@@ -34,26 +36,49 @@ export class SubjectList implements OnInit {
 
 
   constructor(
-    private subjectService: SubjectService
+    private subjectService: SubjectService,
+    private signalRService: SignalRService
   ){}
 
 
 
   ngOnInit(): void {
 
-    this.search$
-    .pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    )
-    .subscribe(search => {
+    this.signalRService.startConnection();
 
-      this.searchTerm = search;
-      this.pageNumber = 1;
+    this.subscriptions.add(
+      this.signalRService.subjectCreated$
+        .subscribe(() => {
+          this.reload$.next();
+        })
+    );
 
-      this.reload$.next();
+    this.subscriptions.add(
+      this.signalRService.subjectUpdated$
+        .subscribe(() => {
+          this.reload$.next();
+        })
+    );
 
-    });
+    this.subscriptions.add(
+      this.signalRService.subjectDeleted$
+        .subscribe(() => {
+          this.reload$.next();
+        })
+    );
+
+    this.subscriptions.add(
+      this.search$
+        .pipe(
+          debounceTime(300),
+          distinctUntilChanged()
+        )
+        .subscribe(search => {
+          this.searchTerm = search;
+          this.pageNumber = 1;
+          this.reload$.next();
+        })
+    );
 
     this.subjects$ = 
       this.reload$
@@ -69,6 +94,10 @@ export class SubjectList implements OnInit {
         map(result => result.items)
       );
 
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   onSearch(search: string): void {

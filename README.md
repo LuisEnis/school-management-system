@@ -15,6 +15,7 @@ The project is being developed as a practical full-stack application with a focu
 * **Entity Framework Core**
 * **SQL Server**
 * **JWT Authentication**
+* **ASP.NET Core SignalR**
 * **Role-Based Authorization**
 * **AutoMapper**
 * **Swagger / OpenAPI**
@@ -152,6 +153,26 @@ The system manages three main relationships:
 These relationships have their own endpoints and validation rules to prevent invalid or duplicate assignments.
 
 ---
+
+### Real-Time Updates
+
+The application uses **ASP.NET Core SignalR** to provide real-time updates between connected clients.
+
+Real-time events are used for:
+
+* Student changes
+* Teacher changes
+* Subject changes
+* Class changes
+* Student-class assignments
+* Teacher-subject assignments
+* Teaching assignments
+* Dashboard updates
+* Class details updates
+
+The SignalR hub is protected using JWT authentication. The Angular client supplies the access token when establishing the hub connection and uses automatic reconnection.
+
+When running with Docker, Nginx proxies SignalR WebSocket connections to the ASP.NET Core API.
 
 ## 🖥️ Dashboard
 
@@ -402,10 +423,12 @@ The frontend uses Angular standalone components and Reactive Forms.
 * Teacher class access validation
 * Backend/frontend integration and manual testing
 * Full-stack Docker / Docker Compose support
+* Real-time updates with ASP.NET Core SignalR
+* JWT-secured SignalR connections
+* SignalR WebSocket support through Nginx and Docker
 
 ### Planned / Remaining
 
-* SignalR real-time functionality
 * Caching
 * Refresh token authentication
 * Automated backend testing
@@ -543,27 +566,21 @@ The main goals are:
 ## 📌 Future Improvements
 The next development phases are:
 
-1. **Docker / Docker Compose**
-   * Containerize the application and its supporting services.
-
-2. **SignalR**
-   * Add a useful real-time feature to the application.
-
-3. **Caching & Refresh Tokens**
+1. **Caching & Refresh Tokens**
    * Evaluate and implement caching where beneficial.
    * Implement refresh token authentication.
 
-4. **Automated Testing**
+2. **Automated Testing**
    * Add automated backend tests.
    * Add automated frontend tests.
 
-5. **CI/CD**
+3. **CI/CD**
    * Build a GitHub Actions pipeline for automated build, testing, and deployment workflows.
 
-6. **Cloud Deployment**
+4. **Cloud Deployment**
    * Deploy the application to a cloud platform.
 
-7. **AI / LLM Integration**
+5. **AI / LLM Integration**
    * Add a practical AI-powered feature to the School Management System.
 ---
 ## 👨‍💻 Author

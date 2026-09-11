@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 import { AssignmentService } from '../../../core/services/assignment.service';
 import { TeacherSubjectAssignmentDto }
 from '../../../core/models/assignments/teacher-subject-assignment.dto';
-import { Observable, startWith, Subject, switchMap } from 'rxjs';
+import { Observable, startWith, Subject, Subscription, switchMap } from 'rxjs';
+import { SignalRService } from '../../../core/services/signalr.service';
 
 
 @Component({
@@ -18,20 +19,38 @@ import { Observable, startWith, Subject, switchMap } from 'rxjs';
  templateUrl:'./teacher-subject-assignment.html',
  styleUrl:'./teacher-subject-assignment.css'
 })
-export class TeacherSubjectAssignment implements OnInit {
+export class TeacherSubjectAssignment implements OnInit, OnDestroy {
 
  private reload$ = new Subject<void>();
+ private subscriptions = new Subscription();
  assignments$!: Observable<TeacherSubjectAssignmentDto[]>;
 
 
 
  constructor(
-  private assignmentService: AssignmentService
+  private assignmentService: AssignmentService,
+  private signalRService: SignalRService
  ){}
 
 
 
  ngOnInit():void {
+
+  this.signalRService.startConnection();
+
+  this.subscriptions.add(
+    this.signalRService.teacherSubjectAssigned$
+      .subscribe(() => {
+        this.reload$.next();
+      })
+  );
+
+  this.subscriptions.add(
+    this.signalRService.teacherSubjectRemoved$
+      .subscribe(() => {
+        this.reload$.next();
+      })
+  );
 
   this.assignments$ = 
                    this.reload$
@@ -44,7 +63,9 @@ export class TeacherSubjectAssignment implements OnInit {
 
  }
 
-
+ ngOnDestroy(): void {
+  this.subscriptions.unsubscribe();
+ }
 
  delete(
   teacherId:number,
@@ -78,6 +99,3 @@ export class TeacherSubjectAssignment implements OnInit {
 
 }
 
-function startWIth(arg0: null): import("rxjs").OperatorFunction<void, unknown> {
-  throw new Error('Function not implemented.');
-}

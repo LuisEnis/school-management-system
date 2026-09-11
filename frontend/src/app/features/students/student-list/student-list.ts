@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 import { UserService } from '../../../core/services/user.service';
+import { SignalRService } from '../../../core/services/signalr.service';
 import { UserDto } from '../../../core/models/users/user.dto';
-import { debounceTime, distinctUntilChanged, map, Observable, startWith, Subject, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, Observable, startWith, Subject, Subscription, switchMap, tap } from 'rxjs';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination';
 import { PagedResult } from '../../../core/models/common/paged-result.model';
 
@@ -20,10 +21,11 @@ import { PagedResult } from '../../../core/models/common/paged-result.model';
   templateUrl: './student-list.html',
   styleUrl: './student-list.css'
 })
-export class StudentList implements OnInit {
+export class StudentList implements OnInit, OnDestroy  {
 
   private reload$ = new Subject<void>();
   private search$ = new Subject<string>();
+  private subscriptions = new Subscription();
   students$!: Observable<UserDto[]>;
   pageNumber = 1;
   pageSize = 15;
@@ -35,25 +37,49 @@ export class StudentList implements OnInit {
 
 
   constructor(
-    private userService: UserService
+    private userService: UserService,
+    private signalRService: SignalRService
   ) {}
 
 
   ngOnInit(): void {
 
-    this.search$
-      .pipe(
-        debounceTime(400),
-        distinctUntilChanged()
-      )
-      .subscribe(search => {
+    this.signalRService.startConnection();
 
-        this.search = search;
-        this.pageNumber = 1;
+    this.subscriptions.add(
+      this.signalRService.studentCreated$
+        .subscribe(() => {
+          this.reload$.next();
+        })
+    );
 
-        this.reload$.next();
+    this.subscriptions.add(
+      this.signalRService.studentUpdated$
+        .subscribe(() => {
+          this.reload$.next();
+        })
+    );
 
-      });
+    this.subscriptions.add(
+      this.signalRService.studentDeleted$
+        .subscribe(() => {
+          this.reload$.next();
+        })
+    );
+
+    this.subscriptions.add(
+      this.search$
+        .pipe(
+          debounceTime(400),
+          distinctUntilChanged()
+        )
+        .subscribe(search => {
+          this.search = search;
+          this.pageNumber = 1;
+
+          this.reload$.next();
+        })
+    );
 
       this.students$ =
               this.reload$
@@ -72,6 +98,10 @@ export class StudentList implements OnInit {
                   map(result => result.items)
               );
 
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   onSearch(event: Event): void {

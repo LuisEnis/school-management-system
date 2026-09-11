@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 import { UserService } from '../../../core/services/user.service';
 import { UserDto } from '../../../core/models/users/user.dto';
-import { debounceTime, distinctUntilChanged, map, Observable, startWith, Subject, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, Observable, startWith, Subject, Subscription, switchMap, tap } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination';
 import { PagedResult } from '../../../core/models/common/paged-result.model';
+import { SignalRService } from '../../../core/services/signalr.service';
 
 
 @Component({
@@ -21,8 +22,9 @@ import { PagedResult } from '../../../core/models/common/paged-result.model';
   templateUrl:'./teacher-list.html',
   styleUrl:'./teacher-list.css'
 })
-export class TeacherList implements OnInit {
+export class TeacherList implements OnInit, OnDestroy  {
 
+private subscriptions = new Subscription();
 private reload$ = new Subject<void>();
 private search$ = new Subject<string>();
 teachers$!: Observable<UserDto[]>;
@@ -37,25 +39,49 @@ sortDescending = false;
 
 constructor(
  private userService:UserService,
- public authService: AuthService
+ public authService: AuthService,
+ private signalRService: SignalRService
 ){}
 
 
 
 ngOnInit():void{
-  this.search$
-    .pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    )
-    .subscribe(search => {
 
-      this.searchTerm = search;
-      this.pageNumber = 1;
+  this.signalRService.startConnection();
 
-      this.reload$.next();
+  this.subscriptions.add(
+    this.signalRService.teacherCreated$
+      .subscribe(() => {
+        this.reload$.next();
+      })
+  );
 
-    });
+  this.subscriptions.add(
+    this.signalRService.teacherUpdated$
+      .subscribe(() => {
+        this.reload$.next();
+      })
+  );
+
+  this.subscriptions.add(
+    this.signalRService.teacherDeleted$
+      .subscribe(() => {
+        this.reload$.next();
+      })
+  );
+
+  this.subscriptions.add(
+    this.search$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged()
+      )
+      .subscribe(search => {
+        this.searchTerm = search;
+        this.pageNumber = 1;
+        this.reload$.next();
+      })
+  );
 
   this.teachers$ =
                 this.reload$
@@ -73,6 +99,10 @@ ngOnInit():void{
   
                     map(result => result.items)
                 );
+}
+
+ngOnDestroy(): void {
+  this.subscriptions.unsubscribe();
 }
 
 onSearch(search: string): void {

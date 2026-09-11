@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
+import { Observable, startWith, Subject, Subscription, switchMap } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 import { StudentService } from '../../core/services/student.service';
@@ -17,6 +17,7 @@ from '../../core/models/teachers/teacher-assignment.dto';
 import { RouterLink } from '@angular/router';
 import { ManagementDashboardDto } from '../../core/models/managementDashboard/management-dashboard.dto';
 import { DashboardService } from '../../core/services/dashboard.service';
+import { SignalRService } from '../../core/services/signalr.service';
 
 
 
@@ -30,7 +31,10 @@ import { DashboardService } from '../../core/services/dashboard.service';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
-export class Dashboard implements OnInit {
+export class Dashboard implements OnInit, OnDestroy {
+
+  private reload$ = new Subject<void>();
+  private subscriptions = new Subscription();
 
 
   UserRole = UserRole;
@@ -47,7 +51,8 @@ export class Dashboard implements OnInit {
     private authService: AuthService,
     private studentService: StudentService,
     private teacherService: TeacherService,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private signalRService: SignalRService
   ){}
 
 
@@ -61,6 +66,7 @@ export class Dashboard implements OnInit {
 
 
   ngOnInit(): void {
+    this.signalRService.startConnection();
 
 
     if (
@@ -69,8 +75,82 @@ export class Dashboard implements OnInit {
     ) {
 
       this.managementDashboard$ =
-        this.dashboardService
-          .getManagementDashboard();
+        this.reload$.pipe(
+          startWith(null),
+          switchMap(() =>
+            this.dashboardService.getManagementDashboard()
+          )
+        );
+
+        this.subscriptions.add(
+          this.signalRService.studentCreated$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.studentDeleted$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.teacherCreated$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.teacherDeleted$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.subjectCreated$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.subjectDeleted$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.classCreated$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.classDeleted$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.studentClassAssigned$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.studentClassRemoved$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.teacherSubjectAssigned$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.teacherSubjectRemoved$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.teachingAssignmentCreated$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.teachingAssignmentRemoved$
+            .subscribe(() => this.reload$.next())
+        );
 
     }
     
@@ -78,7 +158,32 @@ export class Dashboard implements OnInit {
     if(this.user?.role === UserRole.Student){
 
       this.studentDashboard$ =
-        this.studentService.getDashboard();
+        this.reload$.pipe(
+          startWith(null),
+          switchMap(() =>
+            this.studentService.getDashboard()
+          )
+        );
+
+        this.subscriptions.add(
+          this.signalRService.studentClassAssigned$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.studentClassRemoved$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.teachingAssignmentCreated$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.teachingAssignmentRemoved$
+            .subscribe(() => this.reload$.next())
+        );
 
     }
 
@@ -87,11 +192,40 @@ export class Dashboard implements OnInit {
     if(this.user?.role === UserRole.Teacher){
 
       this.teacherAssignments$ =
-        this.teacherService.getClasses();
+        this.reload$.pipe(
+          startWith(null),
+          switchMap(() =>
+            this.teacherService.getClasses()
+          )
+        );
+
+        this.subscriptions.add(
+          this.signalRService.teacherSubjectAssigned$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.teacherSubjectRemoved$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.teachingAssignmentCreated$
+            .subscribe(() => this.reload$.next())
+        );
+
+        this.subscriptions.add(
+          this.signalRService.teachingAssignmentRemoved$
+            .subscribe(() => this.reload$.next())
+        );
 
     }
 
 
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
 

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using SchoolManagement.API.Data;
+using SchoolManagement.API.Hubs;
 using SchoolManagement.API.Interfaces.Repositories;
 using SchoolManagement.API.Interfaces.Services;
 using SchoolManagement.API.Mappings;
@@ -29,7 +30,8 @@ namespace SchoolManagement.API
                     policy
                         .WithOrigins("http://localhost:4200")
                         .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        .AllowAnyMethod()
+                        .AllowCredentials();
                 });
             });
 
@@ -149,6 +151,26 @@ namespace SchoolManagement.API
                                             jwtSettings["Key"]!
                                         ))
                             };
+
+                        options.Events = new JwtBearerEvents
+                        {
+                            OnMessageReceived = context =>
+                            {
+                                var accessToken =
+                                    context.Request.Query["access_token"];
+
+                                var path =
+                                    context.HttpContext.Request.Path;
+
+                                if (!string.IsNullOrEmpty(accessToken) &&
+                                    path.StartsWithSegments("/hubs"))
+                                {
+                                    context.Token = accessToken;
+                                }
+
+                                return Task.CompletedTask;
+                            }
+                        };
                     });
 
             builder.Services.AddAuthorization(options =>
@@ -190,6 +212,8 @@ namespace SchoolManagement.API
                             "Teacher"));
             });
 
+            builder.Services.AddSignalR();
+
             var app = builder.Build();
 
             await DatabaseInitializer.InitializeAsync(app.Services);
@@ -217,6 +241,8 @@ namespace SchoolManagement.API
 
 
             app.MapControllers();
+
+            app.MapHub<SchoolHub>("/hubs/school");
 
             app.Run();
         }

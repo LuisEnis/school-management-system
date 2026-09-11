@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
@@ -7,7 +7,8 @@ from '../../../core/services/assignment.service';
 
 import { TeachingAssignmentDto }
 from '../../../core/models/assignments/teaching-assignment.dto';
-import { Observable, startWith, Subject, switchMap } from 'rxjs';
+import { Observable, startWith, Subject, Subscription, switchMap } from 'rxjs';
+import { SignalRService } from '../../../core/services/signalr.service';
 
 
 
@@ -21,22 +22,40 @@ import { Observable, startWith, Subject, switchMap } from 'rxjs';
  templateUrl:'./teaching-assignment.html',
  styleUrl:'./teaching-assignment.css'
 })
-export class TeachingAssignment implements OnInit {
+export class TeachingAssignment implements OnInit, OnDestroy {
 
 private reload$ = new Subject<void>();
+private subscriptions = new Subscription();
 assignments$!: Observable<TeachingAssignmentDto[]>;
 
 
 
 constructor(
- private assignmentService: AssignmentService
+ private assignmentService: AssignmentService,
+ private signalRService: SignalRService
 ){}
 
 
 
 ngOnInit():void {
 
- this.assignments$ = 
+  this.signalRService.startConnection();
+
+  this.subscriptions.add(
+    this.signalRService.teachingAssignmentCreated$
+      .subscribe(() => {
+        this.reload$.next();
+      })
+  );
+
+  this.subscriptions.add(
+    this.signalRService.teachingAssignmentRemoved$
+      .subscribe(() => {
+        this.reload$.next();
+      })
+  );
+
+  this.assignments$ = 
                     this.reload$
                     .pipe(
                       startWith(null),
@@ -47,7 +66,9 @@ ngOnInit():void {
 
 }
 
-
+ ngOnDestroy(): void {
+  this.subscriptions.unsubscribe();
+ }
 
 delete(
  schoolClassId:number,
@@ -84,6 +105,3 @@ this.assignmentService
 
 }
 
-function startWIth(arg0: null): import("rxjs").OperatorFunction<void, unknown> {
-    throw new Error('Function not implemented.');
-}

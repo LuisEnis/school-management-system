@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 import { SchoolClass } from '../../../core/models/schoolClasses/school-class.model';
 import { SchoolClassService } from '../../../core/services/schoolClass.service';
-import { debounceTime, distinctUntilChanged, map, Observable, shareReplay, startWith, Subject, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, Observable, shareReplay, startWith, Subject, Subscription, switchMap, tap } from 'rxjs';
 import { PagedResult } from '../../../core/models/common/paged-result.model';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination';
+import { SignalRService } from '../../../core/services/signalr.service';
 
 
 @Component({
@@ -20,8 +21,9 @@ import { PaginationComponent } from '../../../shared/components/pagination/pagin
   templateUrl:'./school-class-list.html',
   styleUrl:'./school-class-list.css'
 })
-export class SchoolClassList implements OnInit {
+export class SchoolClassList implements OnInit, OnDestroy {
 
+  private subscriptions = new Subscription();
   private reload$ = new Subject<void>();
   private search$ = new Subject<string>();
   schoolClasses$!: Observable<SchoolClass[]>;
@@ -36,26 +38,49 @@ export class SchoolClassList implements OnInit {
 
 
   constructor(
-    private schoolClassService:SchoolClassService
+    private schoolClassService:SchoolClassService,
+     private signalRService: SignalRService
   ){}
 
 
 
   ngOnInit():void{
 
-    this.search$
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged()
-      )
-      .subscribe(search => {
+    this.signalRService.startConnection();
 
-        this.searchTerm = search;
-        this.pageNumber = 1;
+    this.subscriptions.add(
+      this.signalRService.classCreated$
+        .subscribe(() => {
+          this.reload$.next();
+        })
+    );
 
-        this.reload$.next();
+    this.subscriptions.add(
+      this.signalRService.classUpdated$
+        .subscribe(() => {
+          this.reload$.next();
+        })
+    );
 
-      });
+    this.subscriptions.add(
+      this.signalRService.classDeleted$
+        .subscribe(() => {
+          this.reload$.next();
+        })
+    );
+
+    this.subscriptions.add(
+      this.search$
+        .pipe(
+          debounceTime(300),
+          distinctUntilChanged()
+        )
+        .subscribe(search => {
+          this.searchTerm = search;
+          this.pageNumber = 1;
+          this.reload$.next();
+        })
+    );
 
     this.schoolClasses$ =
         this.reload$
@@ -77,6 +102,10 @@ export class SchoolClassList implements OnInit {
           shareReplay(1)
         );
 
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   onSearch(search: string): void {

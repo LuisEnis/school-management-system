@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
 using SchoolManagement.API.DTOs.Common;
 using SchoolManagement.API.DTOs.Users;
 using SchoolManagement.API.Entities;
 using SchoolManagement.API.Enums;
 using SchoolManagement.API.Exceptions;
+using SchoolManagement.API.Hubs;
 using SchoolManagement.API.Interfaces.Repositories;
 using SchoolManagement.API.Interfaces.Services;
 
@@ -16,19 +18,22 @@ namespace SchoolManagement.API.Services
         private readonly IPasswordHasherService _passwordHasherService;
         private readonly IMapper _mapper;
         private readonly ILogger<UserService> _logger;
+        private readonly IHubContext<SchoolHub> _hubContext;
 
         public UserService(
             IUserRepository userRepository,
             IAssignmentRepository assignmentRepository,
             IPasswordHasherService passwordHasherService,
             IMapper mapper,
-            ILogger<UserService> logger)
+            ILogger<UserService> logger,
+            IHubContext<SchoolHub> hubContext)
         {
             _userRepository = userRepository;
             _assignmentRepository = assignmentRepository;
             _passwordHasherService = passwordHasherService;
             _mapper = mapper;
             _logger = logger;
+            _hubContext = hubContext;
         }
 
         public async Task<PagedResult<UserDto>> GetAllAsync(UserQueryRequest request)
@@ -105,7 +110,22 @@ namespace SchoolManagement.API.Services
 
             _logger.LogInformation("User {UserId} ({Email}) was created with role {Role}.", user.Id, user.Email, user.Role);
 
-            return _mapper.Map<UserDto>(user);
+            var userDto = _mapper.Map<UserDto>(user);
+
+            if (user.Role == UserRole.Student)
+            {
+                await _hubContext.Clients.All.SendAsync(
+                    "StudentCreated",
+                    userDto);
+            }
+            else if (user.Role == UserRole.Teacher)
+            {
+                await _hubContext.Clients.All.SendAsync(
+                    "TeacherCreated",
+                    userDto);
+            }
+
+            return userDto;
         }
 
         public async Task<bool> UpdateAsync(int id, UpdateUserDto dto, UserRole currentUserRole)
@@ -139,6 +159,23 @@ namespace SchoolManagement.API.Services
             await _userRepository.SaveChangesAsync();
 
             _logger.LogInformation("User {UserId} ({Email}) was updated.", user.Id, user.Email);
+
+            if (user.Role == UserRole.Student)
+            {
+                var userDto = _mapper.Map<UserDto>(user);
+
+                await _hubContext.Clients.All.SendAsync(
+                    "StudentUpdated",
+                    userDto);
+            }
+            else if (user.Role == UserRole.Teacher)
+            {
+                var userDto = _mapper.Map<UserDto>(user);
+
+                await _hubContext.Clients.All.SendAsync(
+                    "TeacherUpdated",
+                    userDto);
+            }
 
             return true;
         }
@@ -191,6 +228,19 @@ namespace SchoolManagement.API.Services
             await _userRepository.SaveChangesAsync();
 
             _logger.LogInformation("User {UserId} ({Email}) was deleted.", user.Id, user.Email);
+
+            if (user.Role == UserRole.Student)
+            {
+                await _hubContext.Clients.All.SendAsync(
+                    "StudentDeleted",
+                    user.Id);
+            }
+            else if(user.Role == UserRole.Teacher)
+            {
+                await _hubContext.Clients.All.SendAsync(
+                    "TeacherDeleted",
+                    user.Id);
+            }
 
             return true;
         }

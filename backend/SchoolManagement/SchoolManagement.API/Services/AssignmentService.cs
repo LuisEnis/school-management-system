@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
 using SchoolManagement.API.DTOs.Assignments;
 using SchoolManagement.API.Entities;
 using SchoolManagement.API.Enums;
 using SchoolManagement.API.Exceptions;
+using SchoolManagement.API.Hubs;
 using SchoolManagement.API.Interfaces.Repositories;
 using SchoolManagement.API.Interfaces.Services;
 
@@ -16,9 +18,10 @@ namespace SchoolManagement.API.Services
         private readonly ISchoolClassRepository _schoolClassRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<AssignmentService> _logger;
+        private readonly IHubContext<SchoolHub> _hubContext;
 
 
-        public AssignmentService(IAssignmentRepository assignmentRepository, IUserRepository userRepository, ISubjectRepository subjectRepository, ISchoolClassRepository schoolClassRepository, IMapper mapper, ILogger<AssignmentService> logger)
+        public AssignmentService(IAssignmentRepository assignmentRepository, IUserRepository userRepository, ISubjectRepository subjectRepository, ISchoolClassRepository schoolClassRepository, IMapper mapper, ILogger<AssignmentService> logger, IHubContext<SchoolHub> hubContext)
         {
             _assignmentRepository = assignmentRepository;
             _userRepository = userRepository;
@@ -26,6 +29,7 @@ namespace SchoolManagement.API.Services
             _schoolClassRepository = schoolClassRepository;
             _mapper = mapper;
             _logger = logger;
+            _hubContext = hubContext;
         }
 
 
@@ -79,7 +83,14 @@ namespace SchoolManagement.API.Services
 
             _logger.LogInformation("Student {StudentId} was assigned to class {ClassId}.", dto.StudentId, dto.SchoolClassId);
 
-            return _mapper.Map<StudentClassAssignmentDto>(entity);
+            var assignmentDto =
+                _mapper.Map<StudentClassAssignmentDto>(entity);
+
+            await _hubContext.Clients.All.SendAsync(
+                "StudentClassAssigned",
+                assignmentDto);
+
+            return assignmentDto;
         }
 
 
@@ -135,7 +146,13 @@ namespace SchoolManagement.API.Services
 
             _logger.LogInformation("Teacher {TeacherId} was assigned to subject {SubjectId}.", dto.TeacherId, dto.SubjectId);
 
-            return _mapper.Map<TeacherSubjectAssignmentDto>(entity);
+            var teacherSubjectDto = _mapper.Map<TeacherSubjectAssignmentDto>(entity);
+
+            await _hubContext.Clients.All.SendAsync(
+                "TeacherSubjectAssigned",
+                teacherSubjectDto);
+
+            return teacherSubjectDto;
         }
 
 
@@ -218,7 +235,13 @@ namespace SchoolManagement.API.Services
 
             _logger.LogInformation("Teacher {TeacherId} was assigned to subject {SubjectId} in class {ClassId}.", dto.TeacherId, dto.SubjectId, dto.SchoolClassId);
 
-            return _mapper.Map<TeachingAssignmentDto>(entity);
+            var teachingAssignmentDto = _mapper.Map<TeachingAssignmentDto>(entity);
+
+            await _hubContext.Clients.All.SendAsync(
+                "TeachingAssignmentCreated",
+                teachingAssignmentDto);
+
+            return teachingAssignmentDto;
         }
 
 
@@ -236,6 +259,11 @@ namespace SchoolManagement.API.Services
             await _assignmentRepository.SaveChangesAsync();
 
             _logger.LogInformation("Student {studentId} was removed from class {classId}.", studentId, classId);
+
+            await _hubContext.Clients.All.SendAsync(
+                "StudentClassRemoved",
+                studentId,
+                classId);
 
             return true;
         }
@@ -274,6 +302,11 @@ namespace SchoolManagement.API.Services
 
             _logger.LogInformation("Teacher {teacherId} no longer teaches subject {subjectId}.", teacherId, subjectId);
 
+            await _hubContext.Clients.All.SendAsync(
+                "TeacherSubjectRemoved",
+                teacherId,
+                subjectId);
+
             return true;
         }
 
@@ -295,6 +328,12 @@ namespace SchoolManagement.API.Services
             await _assignmentRepository.SaveChangesAsync();
 
             _logger.LogInformation("Teacher {teacherId} no longer teaches subject {subjectId} in class {classId}.", teacherId, subjectId, classId);
+
+            await _hubContext.Clients.All.SendAsync(
+                "TeachingAssignmentRemoved",
+                classId,
+                subjectId,
+                teacherId);
 
             return true;
         }

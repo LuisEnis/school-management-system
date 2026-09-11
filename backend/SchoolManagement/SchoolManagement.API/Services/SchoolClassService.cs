@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
 using SchoolManagement.API.DTOs.Common;
 using SchoolManagement.API.DTOs.SchoolClasses;
 using SchoolManagement.API.DTOs.Users;
 using SchoolManagement.API.Entities;
 using SchoolManagement.API.Exceptions;
+using SchoolManagement.API.Hubs;
 using SchoolManagement.API.Interfaces.Repositories;
 using SchoolManagement.API.Interfaces.Services;
 
@@ -15,17 +17,20 @@ namespace SchoolManagement.API.Services
         private readonly IAssignmentRepository _assignmentRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<SchoolClassService> _logger;
+        private readonly IHubContext<SchoolHub> _hubContext;
 
         public SchoolClassService(
             ISchoolClassRepository schoolClassRepository,
             IAssignmentRepository assignmentRepository,
             IMapper mapper,
-            ILogger<SchoolClassService> logger)
+            ILogger<SchoolClassService> logger,
+            IHubContext<SchoolHub> hubContext)
         {
             _schoolClassRepository = schoolClassRepository;
             _assignmentRepository = assignmentRepository;
             _mapper = mapper;
             _logger = logger;
+            _hubContext = hubContext;
         }
 
         public async Task<PagedResult<SchoolClassDto>> GetAllAsync(SchoolClassQueryRequest request)
@@ -78,7 +83,13 @@ namespace SchoolManagement.API.Services
 
             _logger.LogInformation("School class {ClassId} ({ClassName}) was created.", schoolClass.Id, schoolClass.Name);
 
-            return _mapper.Map<SchoolClassDto>(schoolClass);
+            var classDto = _mapper.Map<SchoolClassDto>(schoolClass);
+
+            await _hubContext.Clients.All.SendAsync(
+                "ClassCreated",
+                classDto);
+
+            return classDto;
         }
 
         public async Task<bool> UpdateAsync(int id, UpdateSchoolClassDto dto)
@@ -105,6 +116,12 @@ namespace SchoolManagement.API.Services
             await _schoolClassRepository.SaveChangesAsync();
 
             _logger.LogInformation("School class {ClassId} ({ClassName}) was updated.", schoolClass.Id, schoolClass.Name);
+
+            var classDto = _mapper.Map<SchoolClassDto>(schoolClass);
+
+            await _hubContext.Clients.All.SendAsync(
+                "ClassUpdated",
+                classDto);
 
             return true;
         }
@@ -136,6 +153,10 @@ namespace SchoolManagement.API.Services
             await _schoolClassRepository.SaveChangesAsync();
 
             _logger.LogInformation("School class {ClassId} ({ClassName}) was deleted.", schoolClass.Id, schoolClass.Name);
+
+            await _hubContext.Clients.All.SendAsync(
+                "ClassDeleted",
+                schoolClass.Id);
 
             return true;
         }
