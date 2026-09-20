@@ -4,8 +4,10 @@ namespace SchoolManagement.API.Interfaces.Services
 {
     public interface IAuthService
     {
-        Task<LoginResponseDto> LoginAsync(LoginRequestDto dto);
+        Task<AuthResultDto> LoginAsync(LoginRequestDto dto);
 
-        Task LogoutAsync();
+        Task<AuthResultDto> RefreshAsync(string refreshToken);
+
+        Task LogoutAsync(string refreshToken);
     }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { finalize, Observable, shareReplay, tap } from 'rxjs';
 import { LoginRequest } from '../models/auth/login-request.dto';
 import { LoginResponse } from '../models/auth/login-response.dto';
 import { UserDetails } from '../models/users/user-details.dto';
@@ -17,6 +17,8 @@ export class AuthService {
   
   private currentUser: UserDetails | null = null;
 
+  private refreshRequest$: Observable<LoginResponse> | null = null;
+
 
   constructor(
       private http: HttpClient
@@ -31,7 +33,10 @@ export class AuthService {
       return this.http
           .post<LoginResponse>(
               `${this.apiUrl}/login`,
-              request
+              request,
+              {
+                withCredentials: true
+              }
           )
           .pipe(
               tap(response => {
@@ -44,8 +49,65 @@ export class AuthService {
           );
   }
 
+  refreshToken(): Observable<LoginResponse> {
 
-  logout(): void {
+  if (this.refreshRequest$) {
+    return this.refreshRequest$;
+  }
+
+
+  this.refreshRequest$ = this.http
+    .post<LoginResponse>(
+      `${this.apiUrl}/refresh`,
+      {},
+      {
+        withCredentials: true
+      }
+    )
+    .pipe(
+      tap(response => {
+
+        localStorage.setItem(
+          'token',
+          response.token
+        );
+
+      }),
+
+      finalize(() => {
+
+        this.refreshRequest$ = null;
+
+      }),
+
+      shareReplay(1)
+    );
+
+
+  return this.refreshRequest$;
+}
+
+
+  logout(): Observable<void> {
+
+    return this.http
+      .post<void>(
+        `${this.apiUrl}/logout`,
+        {},
+        {
+          withCredentials: true
+        }
+      )
+      .pipe(
+        tap(() => {
+
+          this.clearSession();
+
+        })
+      );
+  }
+
+  clearSession(): void {
 
       this.currentUser = null;
 

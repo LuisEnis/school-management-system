@@ -29,7 +29,7 @@ export class AppInitService {
     .then(() => {})
     .catch(() => {
 
-      this.authService.logout();
+      this.authService.clearSession();
 
     });
 

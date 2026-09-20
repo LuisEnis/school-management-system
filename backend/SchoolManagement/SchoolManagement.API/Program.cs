@@ -95,6 +95,7 @@ namespace SchoolManagement.API
             builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
             builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
             builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+            builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ISubjectService, SubjectService>();
@@ -107,6 +108,7 @@ namespace SchoolManagement.API
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
             builder.Services.AddScoped<IJwtService, JwtService>();
+            builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 

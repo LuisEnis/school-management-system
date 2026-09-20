@@ -24,5 +24,7 @@ namespace SchoolManagement.API.Entities
         public ICollection<TeacherSubject> TeacherSubjects { get; set; } = new List<TeacherSubject>();
 
         public ICollection<TeachingAssignment> TeachingAssignments { get; set; } = new List<TeachingAssignment>();
+
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }
 }

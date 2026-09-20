@@ -27,27 +27,119 @@ namespace SchoolManagement.API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponseDto>> Login(LoginRequestDto dto)
         {
-            var response =
-                await _authService
-                    .LoginAsync(dto);
+            var result = await _authService.LoginAsync(dto);
 
-            return Ok(response);
+            SetRefreshTokenCookie(
+                result.RefreshToken,
+                result.RefreshTokenExpiration);
+
+
+            return Ok(
+                new LoginResponseDto
+                {
+                    Token = result.Token,
+
+                    Expiration = result.Expiration,
+
+                    User = result.User
+                });
+        }
+
+        [HttpPost("refresh")]
+        public async Task<ActionResult<LoginResponseDto>> Refresh()
+        {
+            var refreshToken =
+                Request.Cookies["refreshToken"];
+
+            if (string.IsNullOrWhiteSpace(refreshToken))
+            {
+                DeleteRefreshTokenCookie();
+
+                throw new UnauthorizedException(
+                    "Refresh token is missing.");
+            }
+
+
+            try
+            {
+                var result =
+                    await _authService.RefreshAsync(
+                        refreshToken);
+
+
+                SetRefreshTokenCookie(
+                    result.RefreshToken,
+                    result.RefreshTokenExpiration);
+
+
+                return Ok(
+                    new LoginResponseDto
+                    {
+                        Token = result.Token,
+                        Expiration = result.Expiration,
+                        User = result.User
+                    });
+            }
+            catch (UnauthorizedException)
+            {
+                DeleteRefreshTokenCookie();
+
+                throw;
+            }
+        }
+
+        private void SetRefreshTokenCookie(string refreshToken, DateTime expiration)
+        {
+            Response.Cookies.Append(
+                "refreshToken",
+                refreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = expiration
+                });
+        }
+
+
+        private void DeleteRefreshTokenCookie()
+        {
+            Response.Cookies.Delete(
+                "refreshToken",
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None
+                });
         }
 
         /// <summary>
         /// Used to logout.
         /// </summary>
-        [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            await _authService
-                .LogoutAsync();
+            var refreshToken =
+                Request.Cookies["refreshToken"];
 
-            return Ok(new
+
+            if (!string.IsNullOrWhiteSpace(refreshToken))
             {
-                message = "Logged out successfully."
-            });
+                await _authService.LogoutAsync(
+                    refreshToken);
+            }
+
+
+            DeleteRefreshTokenCookie();
+
+
+            return Ok(
+                new
+                {
+                    message = "Logged out successfully."
+                });
         }
 
         /// <summary>

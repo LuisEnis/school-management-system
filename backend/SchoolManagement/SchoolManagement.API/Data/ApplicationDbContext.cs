@@ -23,6 +23,8 @@ namespace SchoolManagement.API.Data
 
         public DbSet<TeachingAssignment> TeachingAssignments { get; set; }
 
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -75,6 +77,16 @@ namespace SchoolManagement.API.Data
                 .WithOne(ta => ta.SchoolClass)
                 .HasForeignKey(ta => ta.SchoolClassId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.RefreshTokens)
+                .WithOne(rt => rt.User)
+                .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasIndex(rt => rt.TokenHash)
+                .IsUnique();
         }
     }
 }

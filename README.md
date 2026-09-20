@@ -15,6 +15,7 @@ The project is being developed as a practical full-stack application with a focu
 * **Entity Framework Core**
 * **SQL Server**
 * **JWT Authentication**
+* **Refresh Token Authentication**
 * **ASP.NET Core SignalR**
 * **Role-Based Authorization**
 * **AutoMapper**
@@ -70,6 +71,15 @@ Frontend guards and UI restrictions improve the user experience, while backend a
 ### Authentication & Authorization
 
 * User login with JWT authentication
+* Short-lived JWT access tokens for authenticated API requests
+* Refresh-token authentication for automatic session renewal
+* Refresh tokens stored in Secure, HttpOnly cookies
+* Refresh-token hashes stored in the database instead of raw tokens
+* Refresh-token rotation after successful refresh
+* Refresh-token revocation on logout
+* Automatic access-token renewal through the Angular HTTP interceptor
+* Concurrent refresh requests share a single refresh operation
+* Expired or invalid refresh sessions clear the client session and redirect to login
 * Current-user endpoint
 * Role-based authorization policies
 * Protected API endpoints
@@ -342,8 +352,9 @@ Main entities include:
 * StudentClass
 * TeacherSubject
 * TeachingAssignment
+* RefreshToken
 
-The relationships between these entities allow the system to represent students, teachers, classes, subjects, and teaching assignments.
+The relationships between these entities allow the system to represent students, teachers, classes, subjects, teaching assignments, and persisted refresh-token sessions.
 
 Automatic Database Initialization
 
@@ -401,6 +412,9 @@ The frontend uses Angular standalone components and Reactive Forms.
 * Application logging with ILogger
 * Password hashing
 * JWT authentication
+* Refresh-token authentication
+* Refresh-token rotation and revocation
+* Automatic access-token renewal
 * Role-based authorization
 * Swagger/OpenAPI
 * Database-level pagination
@@ -430,7 +444,6 @@ The frontend uses Angular standalone components and Reactive Forms.
 ### Planned / Remaining
 
 * Caching
-* Refresh token authentication
 * Automated backend testing
 * Automated frontend testing
 * CI/CD with GitHub Actions
@@ -523,7 +536,9 @@ Then open the application in the browser.
 7. To intentionally remove the persisted database volume, use `docker compose down -v`.
 ---
 ## 🔑 Authentication Flow
-The application uses JWT-based authentication.
+
+The application uses JWT access tokens together with refresh tokens for session renewal.
+
 ```text
 Login
   ↓
@@ -531,13 +546,29 @@ ASP.NET Core API
   ↓
 Credentials validated
   ↓
-JWT generated
+JWT access token generated
+Refresh token generated
   ↓
-Angular stores token
+Access token returned to Angular
+Refresh token stored in a Secure, HttpOnly cookie
+Refresh token hash stored in SQL Server
   ↓
-HTTP Interceptor adds Bearer token
+Angular sends the JWT as a Bearer token
   ↓
-Protected API endpoints
+Protected API endpoint
+  ↓
+Access token expires
+  ↓
+API returns 401
+  ↓
+Angular HTTP interceptor requests /auth/refresh
+  ↓
+Refresh token validated
+  ↓
+New JWT generated
+Refresh token rotated
+  ↓
+Original API request retried automatically
 ```
 The authenticated user's role determines which functionality is available.
 ---
@@ -557,7 +588,8 @@ The main goals are:
 * Implement application logging and centralized error handling
 * Containerize the application using Docker
 * Implement real-time communication using SignalR
-* Explore caching and token refresh strategies
+* Implement secure refresh-token authentication and automatic session renewal
+* Explore and implement caching where beneficial
 * Implement automated backend and frontend testing
 * Build a CI/CD pipeline using GitHub Actions
 * Deploy the application to the cloud
@@ -566,9 +598,8 @@ The main goals are:
 ## 📌 Future Improvements
 The next development phases are:
 
-1. **Caching & Refresh Tokens**
+1. **Caching**
    * Evaluate and implement caching where beneficial.
-   * Implement refresh token authentication.
 
 2. **Automated Testing**
    * Add automated backend tests.
