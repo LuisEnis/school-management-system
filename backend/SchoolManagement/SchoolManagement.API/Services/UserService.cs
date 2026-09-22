@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
+using SchoolManagement.API.Caching;
 using SchoolManagement.API.DTOs.Common;
 using SchoolManagement.API.DTOs.Users;
 using SchoolManagement.API.Entities;
@@ -19,6 +20,7 @@ namespace SchoolManagement.API.Services
         private readonly IMapper _mapper;
         private readonly ILogger<UserService> _logger;
         private readonly IHubContext<SchoolHub> _hubContext;
+        private readonly ICacheService _cacheService;
 
         public UserService(
             IUserRepository userRepository,
@@ -26,7 +28,8 @@ namespace SchoolManagement.API.Services
             IPasswordHasherService passwordHasherService,
             IMapper mapper,
             ILogger<UserService> logger,
-            IHubContext<SchoolHub> hubContext)
+            IHubContext<SchoolHub> hubContext,
+            ICacheService cacheService)
         {
             _userRepository = userRepository;
             _assignmentRepository = assignmentRepository;
@@ -34,6 +37,7 @@ namespace SchoolManagement.API.Services
             _mapper = mapper;
             _logger = logger;
             _hubContext = hubContext;
+            _cacheService = cacheService;
         }
 
         public async Task<PagedResult<UserDto>> GetAllAsync(UserQueryRequest request)
@@ -107,6 +111,12 @@ namespace SchoolManagement.API.Services
 
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
+
+            if (user.Role == UserRole.Student || user.Role == UserRole.Teacher)
+            {
+                _cacheService.Remove(
+                    CacheKeys.ManagementDashboard);
+            }
 
             _logger.LogInformation("User {UserId} ({Email}) was created with role {Role}.", user.Id, user.Email, user.Role);
 
@@ -226,6 +236,12 @@ namespace SchoolManagement.API.Services
             _userRepository.Delete(user);
 
             await _userRepository.SaveChangesAsync();
+
+            if (user.Role == UserRole.Student || user.Role == UserRole.Teacher)
+            {
+                _cacheService.Remove(
+                    CacheKeys.ManagementDashboard);
+            }
 
             _logger.LogInformation("User {UserId} ({Email}) was deleted.", user.Id, user.Email);
 

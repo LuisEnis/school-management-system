@@ -193,6 +193,21 @@ namespace SchoolManagement.API.Repositories
                 .ToListAsync();
         }
 
+        public async Task<int> CountStudentClassAssignmentsAsync()
+        {
+            return await _context.StudentClasses.CountAsync();
+        }
+
+        public async Task<int> CountTeacherSubjectAssignmentsAsync()
+        {
+            return await _context.TeacherSubjects.CountAsync();
+        }
+
+        public async Task<int> CountTeachingAssignmentsAsync()
+        {
+            return await _context.TeachingAssignments.CountAsync();
+        }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

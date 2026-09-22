@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
+using SchoolManagement.API.Caching;
 using SchoolManagement.API.DTOs.Assignments;
 using SchoolManagement.API.Entities;
 using SchoolManagement.API.Enums;
@@ -19,9 +20,10 @@ namespace SchoolManagement.API.Services
         private readonly IMapper _mapper;
         private readonly ILogger<AssignmentService> _logger;
         private readonly IHubContext<SchoolHub> _hubContext;
+        private readonly ICacheService _cacheService;
 
 
-        public AssignmentService(IAssignmentRepository assignmentRepository, IUserRepository userRepository, ISubjectRepository subjectRepository, ISchoolClassRepository schoolClassRepository, IMapper mapper, ILogger<AssignmentService> logger, IHubContext<SchoolHub> hubContext)
+        public AssignmentService(IAssignmentRepository assignmentRepository, IUserRepository userRepository, ISubjectRepository subjectRepository, ISchoolClassRepository schoolClassRepository, IMapper mapper, ILogger<AssignmentService> logger, IHubContext<SchoolHub> hubContext, ICacheService cacheService)
         {
             _assignmentRepository = assignmentRepository;
             _userRepository = userRepository;
@@ -30,6 +32,7 @@ namespace SchoolManagement.API.Services
             _mapper = mapper;
             _logger = logger;
             _hubContext = hubContext;
+            _cacheService = cacheService;
         }
 
 
@@ -80,6 +83,8 @@ namespace SchoolManagement.API.Services
 
             await _assignmentRepository
                 .SaveChangesAsync();
+
+            _cacheService.Remove(CacheKeys.ManagementDashboard);
 
             _logger.LogInformation("Student {StudentId} was assigned to class {ClassId}.", dto.StudentId, dto.SchoolClassId);
 
@@ -143,6 +148,8 @@ namespace SchoolManagement.API.Services
 
             await _assignmentRepository
                 .SaveChangesAsync();
+
+            _cacheService.Remove(CacheKeys.ManagementDashboard);
 
             _logger.LogInformation("Teacher {TeacherId} was assigned to subject {SubjectId}.", dto.TeacherId, dto.SubjectId);
 
@@ -233,6 +240,8 @@ namespace SchoolManagement.API.Services
             await _assignmentRepository
                 .SaveChangesAsync();
 
+            _cacheService.Remove(CacheKeys.ManagementDashboard);
+
             _logger.LogInformation("Teacher {TeacherId} was assigned to subject {SubjectId} in class {ClassId}.", dto.TeacherId, dto.SubjectId, dto.SchoolClassId);
 
             var teachingAssignmentDto = _mapper.Map<TeachingAssignmentDto>(entity);
@@ -257,6 +266,8 @@ namespace SchoolManagement.API.Services
             _assignmentRepository.DeleteStudentClass(assignment);
 
             await _assignmentRepository.SaveChangesAsync();
+
+            _cacheService.Remove(CacheKeys.ManagementDashboard);
 
             _logger.LogInformation("Student {studentId} was removed from class {classId}.", studentId, classId);
 
@@ -300,6 +311,8 @@ namespace SchoolManagement.API.Services
 
             await _assignmentRepository.SaveChangesAsync();
 
+            _cacheService.Remove(CacheKeys.ManagementDashboard);
+
             _logger.LogInformation("Teacher {teacherId} no longer teaches subject {subjectId}.", teacherId, subjectId);
 
             await _hubContext.Clients.All.SendAsync(
@@ -326,6 +339,8 @@ namespace SchoolManagement.API.Services
             _assignmentRepository.DeleteTeachingAssignment(assignment);
 
             await _assignmentRepository.SaveChangesAsync();
+
+            _cacheService.Remove(CacheKeys.ManagementDashboard);
 
             _logger.LogInformation("Teacher {teacherId} no longer teaches subject {subjectId} in class {classId}.", teacherId, subjectId, classId);
 

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
+using SchoolManagement.API.Caching;
 using SchoolManagement.API.DTOs.Common;
 using SchoolManagement.API.DTOs.Subjects;
 using SchoolManagement.API.Entities;
@@ -18,19 +19,22 @@ namespace SchoolManagement.API.Services
         private readonly IMapper _mapper;
         private readonly ILogger<SubjectService> _logger;
         private readonly IHubContext<SchoolHub> _hubContext;
+        private readonly ICacheService _cacheService;
 
         public SubjectService(
             ISubjectRepository subjectRepository,
             IAssignmentRepository assignmentRepository,
             IMapper mapper,
             ILogger<SubjectService> logger,
-            IHubContext<SchoolHub> hubContext)
+            IHubContext<SchoolHub> hubContext,
+            ICacheService cacheService)
         {
             _subjectRepository = subjectRepository;
             _assignmentRepository = assignmentRepository;
             _mapper = mapper;
             _logger = logger;
             _hubContext = hubContext;
+            _cacheService = cacheService;
         }
 
         public async Task<PagedResult<SubjectDto>> GetAllAsync(SubjectQueryRequest request)
@@ -79,6 +83,7 @@ namespace SchoolManagement.API.Services
 
             await _subjectRepository.AddAsync(subject);
             await _subjectRepository.SaveChangesAsync();
+            _cacheService.Remove(CacheKeys.ManagementDashboard);
 
             _logger.LogInformation("Subject {SubjectId} ({SubjectName}) was created.", subject.Id, subject.Name);
 
@@ -151,6 +156,8 @@ namespace SchoolManagement.API.Services
             _subjectRepository.Delete(subject);
 
             await _subjectRepository.SaveChangesAsync();
+
+            _cacheService.Remove(CacheKeys.ManagementDashboard);
 
             _logger.LogInformation("Subject {SubjectId} ({SubjectName}) was deleted.", subject.Id, subject.Name);
 

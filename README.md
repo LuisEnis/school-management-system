@@ -25,6 +25,7 @@ The project is being developed as a practical full-stack application with a focu
 * Password hashing with ASP.NET Core Identity
 * Automatic database migration and initialization
 * Application logging with ILogger
+* In-memory caching with ASP.NET Core IMemoryCache
 
 ### Frontend
 
@@ -184,6 +185,23 @@ The SignalR hub is protected using JWT authentication. The Angular client suppli
 
 When running with Docker, Nginx proxies SignalR WebSocket connections to the ASP.NET Core API.
 
+### Caching
+
+The backend uses **ASP.NET Core IMemoryCache** to cache management dashboard statistics and reduce unnecessary database queries.
+
+The caching implementation uses a cache-aside approach:
+
+* Dashboard statistics are loaded from the database when the cache is empty.
+* The calculated dashboard result is stored in memory with an absolute expiration.
+* Subsequent dashboard requests are served from the cache while the entry is valid.
+* Relevant create, delete, assignment and removal operations explicitly invalidate the dashboard cache.
+* Cache keys and cache durations are centralized to avoid duplicated configuration and magic strings.
+* Dashboard assignment totals use dedicated database count queries instead of loading complete assignment collections.
+
+The management dashboard cache currently uses a **5-minute absolute expiration** as a fallback, while explicit cache invalidation keeps statistics up to date when relevant data changes.
+
+The current implementation uses in-memory caching because the application runs as a single API instance. A distributed cache such as Redis could be introduced in the future if the application is scaled across multiple API instances.
+
 ## 🖥️ Dashboard
 
 The dashboard changes depending on the logged-in user's role.
@@ -213,11 +231,13 @@ The dashboard provides management-level information such as:
 
 * Total number of students
 * Total number of teachers
-* Total number of secretaries
 * Total number of classes
 * Total number of subjects
+* Total student-class assignments
+* Total teacher-subject assignments
+* Total teaching assignments
 
-The management dashboard is provided through dedicated backend endpoints and an Angular dashboard service.
+The management dashboard is provided through dedicated backend endpoints and an Angular dashboard service. Dashboard statistics are cached in memory to reduce repeated database queries, with explicit cache invalidation when relevant data changes.
 
 ---
 
@@ -287,6 +307,7 @@ The backend follows a layered architecture:
 ```text
 SchoolManagement
 │
+├── Caching
 ├── Controllers
 ├── Services
 ├── Interfaces
@@ -440,10 +461,13 @@ The frontend uses Angular standalone components and Reactive Forms.
 * Real-time updates with ASP.NET Core SignalR
 * JWT-secured SignalR connections
 * SignalR WebSocket support through Nginx and Docker
+* In-memory caching with ASP.NET Core IMemoryCache
+* Cache-aside management dashboard caching
+* Explicit cache invalidation for dashboard-related data changes
+* Optimized database count queries for dashboard statistics
 
 ### Planned / Remaining
 
-* Caching
 * Automated backend testing
 * Automated frontend testing
 * CI/CD with GitHub Actions
@@ -589,7 +613,7 @@ The main goals are:
 * Containerize the application using Docker
 * Implement real-time communication using SignalR
 * Implement secure refresh-token authentication and automatic session renewal
-* Explore and implement caching where beneficial
+* Implement caching to reduce unnecessary database queries
 * Implement automated backend and frontend testing
 * Build a CI/CD pipeline using GitHub Actions
 * Deploy the application to the cloud
@@ -598,20 +622,17 @@ The main goals are:
 ## 📌 Future Improvements
 The next development phases are:
 
-1. **Caching**
-   * Evaluate and implement caching where beneficial.
-
-2. **Automated Testing**
+1. **Automated Testing**
    * Add automated backend tests.
    * Add automated frontend tests.
 
-3. **CI/CD**
+2. **CI/CD**
    * Build a GitHub Actions pipeline for automated build, testing, and deployment workflows.
 
-4. **Cloud Deployment**
+3. **Cloud Deployment**
    * Deploy the application to a cloud platform.
 
-5. **AI / LLM Integration**
+4. **AI / LLM Integration**
    * Add a practical AI-powered feature to the School Management System.
 ---
 ## 👨‍💻 Author

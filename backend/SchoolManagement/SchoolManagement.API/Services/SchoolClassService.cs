@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
+using SchoolManagement.API.Caching;
 using SchoolManagement.API.DTOs.Common;
 using SchoolManagement.API.DTOs.SchoolClasses;
 using SchoolManagement.API.DTOs.Users;
@@ -18,19 +19,22 @@ namespace SchoolManagement.API.Services
         private readonly IMapper _mapper;
         private readonly ILogger<SchoolClassService> _logger;
         private readonly IHubContext<SchoolHub> _hubContext;
+        private readonly ICacheService _cacheService;
 
         public SchoolClassService(
             ISchoolClassRepository schoolClassRepository,
             IAssignmentRepository assignmentRepository,
             IMapper mapper,
             ILogger<SchoolClassService> logger,
-            IHubContext<SchoolHub> hubContext)
+            IHubContext<SchoolHub> hubContext,
+            ICacheService cacheService)
         {
             _schoolClassRepository = schoolClassRepository;
             _assignmentRepository = assignmentRepository;
             _mapper = mapper;
             _logger = logger;
             _hubContext = hubContext;
+            _cacheService = cacheService;
         }
 
         public async Task<PagedResult<SchoolClassDto>> GetAllAsync(SchoolClassQueryRequest request)
@@ -80,6 +84,8 @@ namespace SchoolManagement.API.Services
 
             await _schoolClassRepository.AddAsync(schoolClass);
             await _schoolClassRepository.SaveChangesAsync();
+
+            _cacheService.Remove(CacheKeys.ManagementDashboard);
 
             _logger.LogInformation("School class {ClassId} ({ClassName}) was created.", schoolClass.Id, schoolClass.Name);
 
@@ -151,6 +157,8 @@ namespace SchoolManagement.API.Services
             _schoolClassRepository.Delete(schoolClass);
 
             await _schoolClassRepository.SaveChangesAsync();
+
+            _cacheService.Remove(CacheKeys.ManagementDashboard);
 
             _logger.LogInformation("School class {ClassId} ({ClassName}) was deleted.", schoolClass.Id, schoolClass.Name);
 

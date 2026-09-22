@@ -43,6 +43,11 @@ namespace SchoolManagement.API
             // Add services to the container.
 
             builder.Services.AddControllers();
+
+            builder.Services.AddMemoryCache();
+
+            builder.Services.AddSingleton<ICacheService, CacheService>();
+
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddEndpointsApiExplorer();
 

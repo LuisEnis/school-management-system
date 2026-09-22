@@ -54,6 +54,12 @@ namespace SchoolManagement.API.Interfaces.Repositories
 
         Task<IEnumerable<TeachingAssignment>> GetTeachingAssignmentsAsync();
 
+        Task<int> CountStudentClassAssignmentsAsync();
+
+        Task<int> CountTeacherSubjectAssignmentsAsync();
+
+        Task<int> CountTeachingAssignmentsAsync();
+
         Task SaveChangesAsync();
     }
 }
